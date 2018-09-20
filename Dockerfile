@@ -1,0 +1,8 @@
+FROM alpine:3.7
+
+COPY openshift-state-metrics /
+
+ENTRYPOINT ["/openshift-state-metrics", "--port=8080", "--telemetry-port=8081"]
+
+EXPOSE 8080
+EXPOSE 8081
