@@ -1,7 +1,10 @@
 [![Build Status](https://travis-ci.org/openshift/openshift-state-metrics.svg?branch=master)](https://travis-ci.org/wanghaoran1988/openshift-state-metrics)
 
-# OpenShift state metrics for OpenShift related resources
+# Overview
+
 This repository has been heavily inspired by <https://github.com/kubernetes/kube-state-metrics>.
+
+openshift-state-metrics expands upon kube-state-metrics by adding metrics for OpenShift specific resources.
 
 ## How to use
 
