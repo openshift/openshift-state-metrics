@@ -1,0 +1,38 @@
+sudo: required
+
+language: go
+
+go:
+    - "1.11.5"
+
+git:
+  # Benchmark tests needs to access other branches, thereby we need to fetch all
+  # of the repository.
+  depth: false
+
+env:
+  global:
+      - E2E_SETUP_MINIKUBE=yes
+      - E2E_SETUP_KUBECTL=yes
+      - E2E_SETUP_PROMTOOL=yes
+      - MINIKUBE_DRIVER=none
+      - SUDO=sudo
+
+install:
+- mkdir -p $HOME/gopath/src/k8s.io
+- mv $TRAVIS_BUILD_DIR $HOME/gopath/src/k8s.io/kube-state-metrics
+
+jobs:
+  include:
+    # Format
+    - script: make format
+    # Check that all metrics are documented
+    - script: make doccheck
+    # Unit Test
+    - script: make test-unit
+    # Bechmark Test
+    - script: make test-benchmark-compare
+    # Build
+    - script: make build
+    # E2e
+    - script: make e2e
