@@ -1,8 +1,16 @@
-FROM alpine:3.7
+FROM registry.svc.ci.openshift.org/openshift/release:golang-1.10 AS builder
+WORKDIR /go/src/github.com/openshift/openshift-state-metrics
+COPY . .
+RUN make build
 
-COPY openshift-state-metrics /
+FROM  registry.svc.ci.openshift.org/openshift/origin-v4.0:base
+LABEL io.k8s.display-name="openshift-state-metrics" \
+      io.k8s.description="This is a component that exposes metrics about OpenShift objects." \
+      io.openshift.tags="OpenShift" \
+      maintainer="Haoran Wang <haowang@redhat.com>"
 
-ENTRYPOINT ["/openshift-state-metrics", "--port=8080", "--telemetry-port=8081"]
+ARG FROM_DIRECTORY=/go/src/github.com/openshift/openshift-state-metrics
+COPY --from=builder ${FROM_DIRECTORY}/openshift-state-metrics  /usr/bin/openshift-state-metrics
 
-EXPOSE 8080
-EXPOSE 8081
+USER nobody
+ENTRYPOINT ["/usr/bin/openshift-state-metrics"]
