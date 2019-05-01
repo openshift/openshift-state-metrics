@@ -13,9 +13,9 @@ import (
 
 	"github.com/golang/glog"
 	appsv1 "github.com/openshift/api/apps/v1"
-	routev1 "github.com/openshift/api/route/v1"
 	buildv1 "github.com/openshift/api/build/v1"
 	quotav1 "github.com/openshift/api/quota/v1"
+	routev1 "github.com/openshift/api/route/v1"
 	"golang.org/x/net/context"
 )
 
@@ -111,7 +111,7 @@ var availableCollectors = map[string]func(f *Builder) *collector.Collector{
 	"buildconfigs":          func(b *Builder) *collector.Collector { return b.buildBuildConfigCollector() },
 	"builds":                func(b *Builder) *collector.Collector { return b.buildBuildCollector() },
 	"clusterresourcequotas": func(b *Builder) *collector.Collector { return b.buildQuotaCollector() },
-	"routes": func(b *Builder) *collector.Collector { return b.buildRouteCollector() },
+	"routes":                func(b *Builder) *collector.Collector { return b.buildRouteCollector() },
 }
 
 func (b *Builder) buildRouteCollector() *collector.Collector {

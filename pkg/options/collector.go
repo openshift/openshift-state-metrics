@@ -22,6 +22,6 @@ var (
 		"buildconfigs":          struct{}{},
 		"builds":                struct{}{},
 		"clusterresourcequotas": struct{}{},
-		"routes": struct{}{},
+		"routes":                struct{}{},
 	}
 )
