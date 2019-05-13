@@ -1,6 +1,9 @@
 package collectors
 
 import (
+	"github.com/golang/glog"
+	"github.com/openshift/api/route/v1"
+	routeclient "github.com/openshift/client-go/route/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -8,16 +11,13 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kube-state-metrics/pkg/metric"
 	"k8s.io/kube-state-metrics/pkg/version"
-
-	"github.com/golang/glog"
-	"github.com/openshift/api/route/v1"
-	routeclient "github.com/openshift/client-go/route/clientset/versioned"
+	"strconv"
 )
 
 var (
 	descRouteLabelsName          = "openshift_route_labels"
 	descRouteLabelsHelp          = "Kubernetes labels converted to Prometheus labels."
-	descRouteLabelsDefaultLabels = []string{"namespace", "route_name"}
+	descRouteLabelsDefaultLabels = []string{"namespace", "route"}
 
 	routeMetricFamilies = []metric.FamilyGenerator{
 		metric.FamilyGenerator{
@@ -43,23 +43,43 @@ var (
 			GenerateFunc: wrapRouteFunc(func(d *v1.Route) metric.Family {
 				f := metric.Family{}
 				var termination string
+				if d.Spec.TLS != nil {
+					termination = string(d.Spec.TLS.Termination)
+				} else {
+					termination = ""
+				}
+				f.Metrics = append(f.Metrics, &metric.Metric{
+					LabelKeys: []string{"host", "path", "tls_termination", "to_kind", "to_name", "to_weight"},
+					LabelValues: []string{
+						d.Spec.Host,
+						d.Spec.Path,
+						termination,
+						d.Spec.To.Kind,
+						d.Spec.To.Name,
+						strconv.FormatInt(int64(*d.Spec.To.Weight), 10),
+					},
+					Value: 1,
+				})
+
+				return f
+			}),
+		},
+		metric.FamilyGenerator{
+			Name: "openshift_route_status",
+			Type: metric.MetricTypeGauge,
+			Help: "Information about route status.",
+			GenerateFunc: wrapRouteFunc(func(d *v1.Route) metric.Family {
+				f := metric.Family{}
+
 				for _, m := range d.Status.Ingress {
-					if d.Spec.TLS != nil {
-						termination = string(d.Spec.TLS.Termination)
-					} else {
-						termination = ""
-					}
-					for _, n := range m.Conditions {
+					for _, c := range m.Conditions {
 						f.Metrics = append(f.Metrics, &metric.Metric{
-							LabelKeys: []string{"host_name", "tls_termination", "to_kind", "to_name", "router_name", "conditaion_type", "status"},
+							LabelKeys: []string{"status", "type", "host", "router_name"},
 							LabelValues: []string{
-								d.Spec.Host,
-								termination,
-								d.Spec.To.Kind,
-								d.Spec.To.Name,
+								string(c.Status),
+								string(c.Type),
+								m.Host,
 								m.RouterName,
-								string(n.Type),
-								string(n.Status),
 							},
 							Value: 1,
 						})
