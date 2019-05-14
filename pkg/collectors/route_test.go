@@ -4,13 +4,17 @@ import (
 	"testing"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/openshift/api/route/v1"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/kube-state-metrics/pkg/metric"
 )
 
-func TestBuildConfigCollector(t *testing.T) {
+var (
+	weight int32 = 100
+)
+
+func TestRouteConfigCollector(t *testing.T) {
 	// Fixed metadata on type and help text. We prepend this to every expected
 	// output so we only have to modify a single place when doing adjustments.
 	const metadata = `
@@ -32,30 +36,55 @@ func TestBuildConfigCollector(t *testing.T) {
 						"app": "good1",
 					},
 				},
-				Status: v1.RouteSpecStatus{},
-				Spec:   v1.RouteSpec{
+				Status: v1.RouteStatus{
+					Ingress: []v1.RouteIngress{
+						{
+							Host:       "example.com",
+							RouterName: "router1",
+							Conditions: []v1.RouteIngressCondition{
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+							},
+						},
+						{
+							Host:       "example.com",
+							RouterName: "router2",
+							Conditions: []v1.RouteIngressCondition{
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+							},
+						},
+					},
+				},
+				Spec: v1.RouteSpec{
 					Host: "example.com",
-					Strategy: &v1.TLSConfig{
+					TLS: &v1.TLSConfig{
 						Termination: "edge",
 					},
-					To: &v1.RouteTargetReference{
-						Kind: "Service",
-						Name: "svc1",
-						Weight: 100,
-					}
+					To: v1.RouteTargetReference{
+						Kind:   "Service",
+						Name:   "svc1",
+						Weight: &weight,
+					},
 				},
 			},
 			Want: `
         openshift_route_created{route="route1",namespace="ns1"} 1.5e+09
         openshift_route_labels{route="route1",label_app="good1",namespace="ns1"} 1
-				openshift_route_info{route="route1",namespace="ns1", host="example.com", path="", tls_termination="edge", to_kind="Service", to_name="svc1", to_weight="100"} 1
+				openshift_route_info{route="route1",namespace="ns1",host="example.com",path="",tls_termination="edge",to_kind="Service",to_name="svc1",to_weight="100"} 1
+				openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router1"} 1
+				openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router2"} 1
 				`,
-			MetricNames: []string{"openshift_route_labels", "openshift_route_info"},
+			MetricNames: []string{"openshift_route_created", "openshift_route_labels", "openshift_route_info", "openshift_route_status"},
 		},
 	}
 
 	for i, c := range cases {
-		c.Func = metric.ComposeMetricGenFuncs(buildconfigMetricFamilies)
+		c.Func = metric.ComposeMetricGenFuncs(routeMetricFamilies)
 		if err := c.run(); err != nil {
 			t.Errorf("unexpected collecting result in %vth run:\n%s", i, err)
 		}
