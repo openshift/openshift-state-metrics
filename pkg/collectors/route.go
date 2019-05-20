@@ -1,9 +1,8 @@
 package collectors
 
 import (
-	"github.com/golang/glog"
-	"github.com/openshift/api/route/v1"
-	routeclient "github.com/openshift/client-go/route/clientset/versioned"
+	"strconv"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -11,7 +10,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kube-state-metrics/pkg/metric"
 	"k8s.io/kube-state-metrics/pkg/version"
-	"strconv"
+
+	"github.com/golang/glog"
+
+	v1 "github.com/openshift/api/route/v1"
+	routeclient "github.com/openshift/client-go/route/clientset/versioned"
 )
 
 var (
