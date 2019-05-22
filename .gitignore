@@ -13,5 +13,5 @@
 
 *.iml
 .idea/
-
+.vscode
 openshift-state-metrics
