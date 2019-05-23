@@ -18,7 +18,7 @@ spec:
       serviceAccountName: openshift-state-metrics
       containers:
       - name: openshift-state-metrics
-        image: quay.io/redhat/openshift-state-metrics
+        image: quay.io/openshift/origin-openshift-state-metrics:latest
         ports:
         - name: http-metrics
           containerPort: 8080
@@ -30,6 +30,10 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           timeoutSeconds: 5
+        command:
+          - /usr/bin/openshift-state-metrics
+          - --port=8080
+          - --telemetry-port=8081
       - name: addon-resizer
         image: k8s.gcr.io/addon-resizer:1.7
         resources:
