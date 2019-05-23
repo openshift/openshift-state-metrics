@@ -24,6 +24,8 @@ func TestRouteConfigCollector(t *testing.T) {
 		# TYPE openshift_route_labels gauge
 		# HELP openshift_route_info Information about route.
 		# TYPE openshift_route_info gauge
+		# HELP openshift_route_status Information about route status.
+		# TYPE openshift_route_status gauge
 	`
 	cases := []generateMetricsTestCase{
 		{
@@ -75,9 +77,9 @@ func TestRouteConfigCollector(t *testing.T) {
 			Want: `
         openshift_route_created{route="route1",namespace="ns1"} 1.5e+09
         openshift_route_labels{route="route1",label_app="good1",namespace="ns1"} 1
-				openshift_route_info{route="route1",namespace="ns1",host="example.com",path="",tls_termination="edge",to_kind="Service",to_name="svc1",to_weight="100"} 1
-				openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router1"} 1
-				openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router2"} 1
+		openshift_route_info{route="route1",namespace="ns1",host="example.com",path="",tls_termination="edge",to_kind="Service",to_name="svc1",to_weight="100"} 1
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router1"} 1
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router2"} 1
 				`,
 			MetricNames: []string{"openshift_route_created", "openshift_route_labels", "openshift_route_info", "openshift_route_status"},
 		},

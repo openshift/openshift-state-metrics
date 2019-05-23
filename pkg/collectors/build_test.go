@@ -22,8 +22,8 @@ func TestBuildCollector(t *testing.T) {
 		# TYPE openshift_build_labels gauge
 		# HELP openshift_build_status_phase The build phase
 		# TYPE openshift_build_status_phase gauge
-		# HELP openshift_build_started Start time of the build
-		# TYPE openshift_build_started gauge
+		# HELP openshift_build_start Start time of the build
+		# TYPE openshift_build_start gauge
 		# HELP openshift_build_complete Complete time of the build
 		# TYPE openshift_build_complete gauge
 		# TYPE openshift_build_duration Duration of the build
