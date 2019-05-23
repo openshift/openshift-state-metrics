@@ -21,7 +21,7 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 		# HELP openshift_clusterresourcequota_labels Kubernetes labels converted to Prometheus labels.
 		# TYPE openshift_clusterresourcequota_labels gauge
 		# HELP openshift_clusterresourcequota_usage Usage about resource quota
-		# TYPE openshift_clusterresourcequota gauge
+		# TYPE openshift_clusterresourcequota_usage gauge
 `
 	cases := []generateMetricsTestCase{
 		{

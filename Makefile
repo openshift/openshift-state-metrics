@@ -13,6 +13,17 @@ GO_VERSION=1.11
 IMAGE = $(REGISTRY)/openshift-state-metrics
 MULTI_ARCH_IMG = $(IMAGE)-$(ARCH)
 
+doccheck:
+	@echo "- Checking if the documentation is up to date..."
+	@grep -hoE '(openshift_[^ |]+)' docs/* --exclude=README.md| sort -u > documented_metrics
+	@sed -n 's/.*# TYPE \(openshift_[^ ]\+\).*/\1/p' pkg/collectors/*_test.go | sort -u > tested_metrics
+	@diff -u0 tested_metrics documented_metrics || (echo "ERROR: Metrics with - are present in tests but missing in documentation, metrics with + are documented but not tested."; exit 1)
+	@echo OK
+	@rm -f tested_metrics documented_metrics
+	@echo "- Checking for orphan documentation files"
+	@cd docs; for doc in *.md; do if [ "$$doc" != "README.md" ] && ! grep -q "$$doc" *.md; then echo "ERROR: No link to documentation file $${doc} detected"; exit 1; fi; done
+	@echo OK
+
 gofmtcheck:
 	@go fmt $(PKGS) | grep ".*\.go"; if [ "$$?" = "0" ]; then exit 1; fi
 build: clean
