@@ -19,6 +19,7 @@ spec:
       containers:
       - name: openshift-state-metrics
         image: quay.io/openshift/origin-openshift-state-metrics:latest
+        imagePullPolicy: Always
         ports:
         - name: http-metrics
           containerPort: 8080
@@ -36,6 +37,7 @@ spec:
           - --telemetry-port=8081
       - name: addon-resizer
         image: k8s.gcr.io/addon-resizer:1.7
+        imagePullPolicy: Always
         resources:
           limits:
             cpu: 100m
