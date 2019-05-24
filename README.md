@@ -9,3 +9,7 @@ openshift-state-metrics expands upon kube-state-metrics by adding metrics for Op
 ```
 $ oc apply -f ./manifests # It will be deployed to openshift-monitoring project
 ```
+
+## Documentation
+
+Detailed documentation on the available metrics and usage can be found here: https://github.com/openshift/openshift-state-metrics/blob/master/docs/README.md
