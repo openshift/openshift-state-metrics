@@ -99,7 +99,7 @@ var (
 		metric.FamilyGenerator{
 			Name: "openshift_build_complete",
 			Type: metric.MetricTypeGauge,
-			Help: "Complet time of the build",
+			Help: "Completion time of the build",
 			GenerateFunc: wrapBuildFunc(func(b *v1.Build) metric.Family {
 				value := float64(0)
 				if !b.CreationTimestamp.IsZero() && b.Status.CompletionTimestamp != nil {
