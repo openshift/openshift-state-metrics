@@ -1,23 +1,46 @@
 apiVersion: rbac.authorization.k8s.io/v1
-# kubernetes versions before 1.8.0 should use rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: openshift-state-metrics
 rules:
-- apiGroups: ["apps.openshift.io"]
+- apiGroups:
+  - apps.openshift.io
   resources:
   - deploymentconfigs
-  verbs: ["list", "watch"]
-- apiGroups: ["build.openshift.io"]
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - build.openshift.io
   resources:
   - buildconfigs
   - builds
-  verbs: ["list", "watch"]
-- apiGroups: ["quota.openshift.io"]
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - quota.openshift.io
   resources:
   - clusterresourcequotas
-  verbs: ["list", "watch"]
-- apiGroups: ["route.openshift.io"]
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - route.openshift.io
   resources:
   - routes
-  verbs: ["list", "watch"]
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
