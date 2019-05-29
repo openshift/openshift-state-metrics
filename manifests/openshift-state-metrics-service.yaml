@@ -1,22 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: openshift-state-metrics
-  namespace: openshift-monitoring
+  annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: openshift-state-metrics-tls
   labels:
     k8s-app: openshift-state-metrics
-  annotations:
-    prometheus.io/scrape: 'true'
+  name: openshift-state-metrics
+  namespace: openshift-monitoring
 spec:
   ports:
-  - name: http-metrics
-    port: 8080
-    targetPort: http-metrics
-    protocol: TCP
-  - name: telemetry
-    port: 8081
-    targetPort: telemetry
-    protocol: TCP
+  - name: https-main
+    port: 8443
+    targetPort: https-main
+  - name: https-self
+    port: 9443
+    targetPort: https-self
   selector:
     k8s-app: openshift-state-metrics
-
