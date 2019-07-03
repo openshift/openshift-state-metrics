@@ -30,6 +30,9 @@ doccheck:
 
 gofmtcheck:
 	@go fmt $(PKGS) | grep ".*\.go"; if [ "$$?" = "0" ]; then exit 1; fi
+
+vendor: Gopkg.lock
+	dep ensure -vendor-only -v
 build: clean
 	GOOS=$(shell uname -s | tr A-Z a-z) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-s -w -X ${PKG}/version.Release=${TAG} -X ${PKG}/version.Commit=${Commit} -X ${PKG}/version.BuildDate=${BuildDate}" -o openshift-state-metrics
 test-unit: clean build
@@ -51,7 +54,6 @@ all-push: $(addprefix sub-push-,$(ALL_ARCH))
 
 container: .container-$(ARCH)
 .container-$(ARCH):
-	docker run --rm -v "$$PWD":/go/src/github.com/openshift/openshift-state-metrics -w /go/src/github.com/openshift/openshift-state-metrics -e GOOS=linux -e GOARCH=$(ARCH) -e CGO_ENABLED=0 golang:${GO_VERSION} go build -ldflags "-s -w -X ${PKG}/version.Release=${TAG} -X ${PKG}/version.Commit=${Commit} -X ${PKG}/version.BuildDate=${BuildDate}" -o openshift-state-metrics
 	cp -r * $(TEMP_DIR)
 	docker build -t $(MULTI_ARCH_IMG):$(TAG) $(TEMP_DIR)
 	docker tag $(MULTI_ARCH_IMG):$(TAG) $(MULTI_ARCH_IMG):latest
