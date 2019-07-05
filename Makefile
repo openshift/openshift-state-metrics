@@ -17,6 +17,15 @@ GOJSONTOYAML_BINARY=$(GOPATH)/bin/gojsontoyaml
 IMAGE = $(REGISTRY)/openshift-state-metrics
 MULTI_ARCH_IMG = $(IMAGE)-$(ARCH)
 
+validate-modules:
+	@echo "- Verifying that the dependencies have expected content..."
+	GO111MODULE=on go mod verify
+	@echo "- Checking for any unused/missing packages in go.mod..."
+	GO111MODULE=on go mod tidy
+	@echo "- Checking for unused packages in vendor..."
+	GO111MODULE=on go mod vendor
+	@git diff --exit-code -- go.sum go.mod vendor/
+
 doccheck:
 	@echo "- Checking if the documentation is up to date..."
 	@grep -hoE '(openshift_[^ |]+)' docs/* --exclude=README.md| sort -u > documented_metrics
@@ -31,9 +40,9 @@ doccheck:
 gofmtcheck:
 	@go fmt $(PKGS) | grep ".*\.go"; if [ "$$?" = "0" ]; then exit 1; fi
 build: clean
-	GOOS=$(shell uname -s | tr A-Z a-z) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-s -w -X ${PKG}/version.Release=${TAG} -X ${PKG}/version.Commit=${Commit} -X ${PKG}/version.BuildDate=${BuildDate}" -o openshift-state-metrics
+	GO111MODULE=on GOOS=$(shell uname -s | tr A-Z a-z) GOARCH=$(ARCH) CGO_ENABLED=0 go build -ldflags "-s -w -X ${PKG}/version.Release=${TAG} -X ${PKG}/version.Commit=${Commit} -X ${PKG}/version.BuildDate=${BuildDate}" -o openshift-state-metrics
 test-unit: clean build
-	GOOS=$(shell uname -s | tr A-Z a-z) GOARCH=$(ARCH) $(TESTENVVAR) go test --race $(FLAGS) $(PKGS)
+	GO111MODULE=on GOOS=$(shell uname -s | tr A-Z a-z) GOARCH=$(ARCH) $(TESTENVVAR) go test --race $(FLAGS) $(PKGS)
 
 TEMP_DIR := $(shell mktemp -d)
 
@@ -51,7 +60,7 @@ all-push: $(addprefix sub-push-,$(ALL_ARCH))
 
 container: .container-$(ARCH)
 .container-$(ARCH):
-	docker run --rm -v "$$PWD":/go/src/github.com/openshift/openshift-state-metrics -w /go/src/github.com/openshift/openshift-state-metrics -e GOOS=linux -e GOARCH=$(ARCH) -e CGO_ENABLED=0 golang:${GO_VERSION} go build -ldflags "-s -w -X ${PKG}/version.Release=${TAG} -X ${PKG}/version.Commit=${Commit} -X ${PKG}/version.BuildDate=${BuildDate}" -o openshift-state-metrics
+	docker run --rm -v "$$PWD":/go/src/github.com/openshift/openshift-state-metrics -w /go/src/github.com/openshift/openshift-state-metrics -e GO111MODULE=on  -e GOOS=linux -e GOARCH=$(ARCH) -e CGO_ENABLED=0 golang:${GO_VERSION} go build -ldflags "-s -w -X ${PKG}/version.Release=${TAG} -X ${PKG}/version.Commit=${Commit} -X ${PKG}/version.BuildDate=${BuildDate}" -o openshift-state-metrics
 	cp -r * $(TEMP_DIR)
 	docker build -t $(MULTI_ARCH_IMG):$(TAG) $(TEMP_DIR)
 	docker tag $(MULTI_ARCH_IMG):$(TAG) $(MULTI_ARCH_IMG):latest
@@ -86,4 +95,4 @@ $(GOJSONTOYAML_BINARY):
 clean:
 	rm -f openshift-state-metrics
 
-.PHONY: all build all-push all-container test-unit container quay-push clean
+.PHONY: all build all-push all-container test-unit container quay-push clean validate-modules
