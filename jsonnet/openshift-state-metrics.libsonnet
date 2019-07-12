@@ -187,51 +187,6 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       deployment.mixin.spec.template.spec.withServiceAccountName('openshift-state-metrics') +
       deployment.mixin.spec.template.spec.withPriorityClassName('system-cluster-critical'),
 
-    roleBinding:
-      local roleBinding = k.rbac.v1.roleBinding;
-
-      roleBinding.new() +
-      roleBinding.mixin.metadata.withName('openshift-state-metrics') +
-      roleBinding.mixin.metadata.withNamespace($._config.namespace) +
-      roleBinding.mixin.roleRef.withApiGroup('rbac.authorization.k8s.io') +
-      roleBinding.mixin.roleRef.withName('openshift-state-metrics') +
-      roleBinding.mixin.roleRef.mixinInstance({ kind: 'Role' }) +
-      roleBinding.withSubjects([{ kind: 'ServiceAccount', name: 'openshift-state-metrics' }]),
-
-    role:
-      local role = k.rbac.v1.role;
-      local rulesType = role.rulesType;
-
-      local coreRule = rulesType.new() +
-                       rulesType.withApiGroups(['']) +
-                       rulesType.withResources([
-                         'pods',
-                       ]) +
-                       rulesType.withVerbs(['get']);
-
-      local extensionsRule = rulesType.new() +
-                             rulesType.withApiGroups(['extensions']) +
-                             rulesType.withResources([
-                               'deployments',
-                             ]) +
-                             rulesType.withVerbs(['get', 'update']) +
-                             rulesType.withResourceNames(['openshift-state-metrics']);
-
-      local appsRule = rulesType.new() +
-                       rulesType.withApiGroups(['apps']) +
-                       rulesType.withResources([
-                         'deployments',
-                       ]) +
-                       rulesType.withVerbs(['get', 'update']) +
-                       rulesType.withResourceNames(['openshift-state-metrics']);
-
-      local rules = [coreRule, extensionsRule, appsRule];
-
-      role.new() +
-      role.mixin.metadata.withName('openshift-state-metrics') +
-      role.mixin.metadata.withNamespace($._config.namespace) +
-      role.withRules(rules),
-
     serviceAccount:
       local serviceAccount = k.core.v1.serviceAccount;
 
