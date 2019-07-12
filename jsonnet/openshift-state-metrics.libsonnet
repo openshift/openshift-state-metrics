@@ -145,7 +145,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
           '--tls-cert-file=/etc/tls/private/tls.crt',
           '--tls-private-key-file=/etc/tls/private/tls.key',
         ]) +
-        container.withPorts(containerPort.newNamed('https-main', 8443)) +
+        container.withPorts(containerPort.newNamed(8443, 'https-main')) +
         container.mixin.resources.withRequests({ cpu: '10m', memory: '20Mi' }) +
         container.mixin.resources.withLimits({ cpu: '20m', memory: '40Mi' }) +
         container.withVolumeMounts([privateVolumeMount]);
@@ -161,7 +161,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
           '--tls-private-key-file=/etc/tls/private/tls.key',
         ]) +
         container.withVolumeMounts([privateVolumeMount]) +
-        container.withPorts(containerPort.newNamed('https-self', 9443)) +
+        container.withPorts(containerPort.newNamed(9443,'https-self')) +
         container.mixin.resources.withRequests({ cpu: '10m', memory: '20Mi' }) +
         container.mixin.resources.withLimits({ cpu: '20m', memory: '40Mi' });
 
