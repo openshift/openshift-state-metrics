@@ -9,10 +9,10 @@ Commit = $(shell git rev-parse --short HEAD)
 ALL_ARCH = amd64 arm arm64 ppc64le s390x
 PKG=github.com/openshift/openshift-state-metrics/pkg
 GO_VERSION=1.11
-JB_BINARY:=$(GOPATH)/bin/jb
+JB_BINARY:=$(firstword $(subst :, ,$(GOPATH)))/bin/jb
 JSONNET_VENDOR=jsonnet/jsonnetfile.lock.json jsonnet/vendor
 JSONNET_SRC=$(shell find ./jsonnet -type f)
-GOJSONTOYAML_BINARY:=$(GOPATH)/bin/gojsontoyaml
+GOJSONTOYAML_BINARY:=$(firstword $(subst :, ,$(GOPATH)))/bin/gojsontoyaml
 
 IMAGE = $(REGISTRY)/openshift-state-metrics
 MULTI_ARCH_IMG = $(IMAGE)-$(ARCH)
