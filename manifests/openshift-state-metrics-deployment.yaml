@@ -26,8 +26,8 @@ spec:
         image: quay.io/openshift/origin-kube-rbac-proxy:4.2
         name: kube-rbac-proxy-main
         ports:
-        - containerPort: https-main
-          name: 8443
+        - containerPort: 8443
+          name: https-main
         resources:
           limits:
             cpu: 20m
@@ -49,8 +49,8 @@ spec:
         image: quay.io/openshift/origin-kube-rbac-proxy:4.2
         name: kube-rbac-proxy-self
         ports:
-        - containerPort: https-self
-          name: 9443
+        - containerPort: 9443
+          name: https-self
         resources:
           limits:
             cpu: 20m
