@@ -8,6 +8,7 @@ metadata:
   name: openshift-state-metrics
   namespace: openshift-monitoring
 spec:
+  clusterIP: None
   ports:
   - name: https-main
     port: 8443
