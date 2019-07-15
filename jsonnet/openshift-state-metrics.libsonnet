@@ -197,12 +197,13 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       local service = k.core.v1.service;
       local servicePort = k.core.v1.service.mixin.spec.portsType;
 
-      local ksmServicePortMain = servicePort.newNamed('https-main', 8443, 'https-main');
-      local ksmServicePortSelf = servicePort.newNamed('https-self', 9443, 'https-self');
+      local osmServicePortMain = servicePort.newNamed('https-main', 8443, 'https-main');
+      local osmServicePortSelf = servicePort.newNamed('https-self', 9443, 'https-self');
 
-      service.new('openshift-state-metrics', $.openshiftStateMetrics.deployment.spec.selector.matchLabels, [ksmServicePortMain, ksmServicePortSelf]) +
+      service.new('openshift-state-metrics', $.openshiftStateMetrics.deployment.spec.selector.matchLabels, [osmServicePortMain, osmServicePortSelf]) +
       service.mixin.metadata.withNamespace($._config.namespace) +
       service.mixin.metadata.withLabels({ 'k8s-app': 'openshift-state-metrics' }) +
+      service.mixin.spec.withClusterIp('None') +
       service.mixin.metadata.withAnnotations({
         'service.alpha.openshift.io/serving-cert-secret-name': 'openshift-state-metrics-tls',
       }),
