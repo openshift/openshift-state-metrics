@@ -57,7 +57,7 @@ var (
 			GenerateFunc: wrapClusterResourceQuotaFunc(func(r *v1.ClusterResourceQuota) metric.Family {
 				f := metric.Family{}
 
-				for res, qty := range r.Status.Total.Hard {
+				for res, qty := range r.Spec.Quota.Hard {
 					f.Metrics = append(f.Metrics, &metric.Metric{
 						LabelValues: []string{string(res), "hard"},
 						Value:       float64(qty.MilliValue()) / 1000,
@@ -77,6 +77,72 @@ var (
 				return f
 			}),
 		},
+		metric.FamilyGenerator{
+			Name: "openshift_clusterresourcequota_ns_usage",
+			Type: metric.MetricTypeGauge,
+			Help: "Usage about clusterresource quota per namespace.",
+			GenerateFunc: wrapClusterResourceQuotaFunc(func(r *v1.ClusterResourceQuota) metric.Family {
+				f := metric.Family{}
+
+				for _, rq := range r.Status.Namespaces {
+				   for res, qty := range rq.Status.Hard {
+				   	f.Metrics = append(f.Metrics, &metric.Metric{
+				   		LabelValues: []string{string(rq.Namespace), string(res), "hard"},
+				   		Value:       float64(qty.MilliValue()) / 1000,
+				   	})
+				   }
+				   for res, qty := range rq.Status.Used {
+				   	f.Metrics = append(f.Metrics, &metric.Metric{
+				   		LabelValues: []string{string(rq.Namespace),string(res), "used"},
+				   		Value:       float64(qty.MilliValue()) / 1000,
+				   	})
+				   }
+   
+				   for _, m := range f.Metrics {
+				   	m.LabelKeys = []string{"namespace","resource", "type"}
+				   }
+				}   
+
+				return f
+			}),
+		},
+		metric.FamilyGenerator{
+			Name: "openshift_clusterresourcequota_selector",
+			Type: metric.MetricTypeGauge,
+			Help: "Selector of clusterresource quota, which defines the affected namespaces.",
+			GenerateFunc: wrapClusterResourceQuotaFunc(func(r *v1.ClusterResourceQuota) metric.Family {
+				f := metric.Family{}
+
+				sel := r.Spec.Selector
+				for key, value := range sel.AnnotationSelector {
+					// lv := append([]string{r.Name, "annotation", key, value})
+					//ch <- prometheus.MustNewConstMetric(descClusterResourceQuotaSelector, prometheus.GaugeValue, 1, lv...)
+					f.Metrics = append(f.Metrics, &metric.Metric{
+						LabelValues: []string{"annotation", string(key), string(value)},
+						Value:       float64(1),
+					})
+				}
+		 
+				if (sel.LabelSelector != nil) {
+					labelMap := (make(map[string]string))
+					metav1.Convert_v1_LabelSelector_To_Map_string_To_string(sel.LabelSelector,&labelMap,nil)
+					for key, value := range labelMap {
+					 //lv := append([]string{r.Name, "label", key, value})
+					 //ch <- prometheus.MustNewConstMetric(descClusterResourceQuotaSelector, prometheus.GaugeValue, 1, lv...)
+  					  f.Metrics = append(f.Metrics, &metric.Metric{
+  					  	LabelValues: []string{"label", string(key), string(value)},
+  					  	Value:       float64(1),
+						})
+					}
+				}
+
+				for _, m := range f.Metrics {
+					m.LabelKeys = []string{"type","key","value"}
+				}  
+				return f
+			}),
+		},
+
 	}
 )
 
