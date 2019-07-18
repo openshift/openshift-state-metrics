@@ -182,7 +182,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       deployment.mixin.metadata.withNamespace($._config.namespace) +
       deployment.mixin.metadata.withLabels(podLabels) +
       deployment.mixin.spec.selector.withMatchLabels(podLabels) +
-      deployment.mixin.spec.template.spec.withNodeSelector({ 'beta.kubernetes.io/os': 'linux' }) +
+      deployment.mixin.spec.template.spec.withNodeSelector({ 'kubernetes.io/os': 'linux' }) +
       deployment.mixin.spec.template.spec.withVolumes([privateVolume]) +
       deployment.mixin.spec.template.spec.withServiceAccountName('openshift-state-metrics') +
       deployment.mixin.spec.template.spec.withPriorityClassName('system-cluster-critical'),
