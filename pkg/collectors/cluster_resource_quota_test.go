@@ -24,8 +24,8 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 		# TYPE openshift_clusterresourcequota_selector gauge
 		# HELP openshift_clusterresourcequota_usage Usage about resource quota
 		# TYPE openshift_clusterresourcequota_usage gauge
-		# HELP openshift_clusterresourcequota_ns_usage Usage about applied resource quota per namespace
-		# TYPE openshift_clusterresourcequota_ns_usage gauge
+		# HELP openshift_clusterresourcequota_namespace_usage Usage about applied resource quota per namespace
+		# TYPE openshift_clusterresourcequota_namespace_usage gauge
 `
 	cases := []generateMetricsTestCase{
 		{
@@ -47,9 +47,53 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 		openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
         openshift_clusterresourcequota_labels{label_quota="test",name="quota1"} 1
 `,
-
 			MetricNames: []string{"openshift_clusterresourcequota_created", "openshift_clusterresourcequota_selector", "openshift_clusterresourcequota_labels", "openshift_clusterresourcequota_usage"},
 		},
+
+		{
+			Obj: &v1.ClusterResourceQuota{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:              "quota1",
+					CreationTimestamp: metav1.Time{Time: time.Unix(1500000000, 0)},
+					Namespace:         "ns1",
+					Labels: map[string]string{
+						"quota": "test",
+					},
+				},
+				Spec: v1.ClusterResourceQuotaSpec{
+					Selector: v1.ClusterResourceQuotaSelector{
+						AnnotationSelector: map[string]string{},
+						LabelSelector: &metav1.LabelSelector{
+							// matchExpressions:
+							//    - {key: tier, operator: In, values: [cache]}
+							MatchExpressions: []metav1.LabelSelectorRequirement{
+								{
+									Key:      "tier",
+									Operator: "In",
+									Values:   []string{"cache2,cache3"},
+								},
+								{
+									Key:      "tier2",
+									Operator: "DoesNotExist",
+									//not set: Values:   []string{""},
+								},
+							},
+						},
+					},
+				},
+				Status: v1.ClusterResourceQuotaStatus{
+					Total: corev1.ResourceQuotaStatus{},
+				},
+			},
+			Want: `
+		openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
+		openshift_clusterresourcequota_labels{label_quota="test",name="quota1"} 1
+		openshift_clusterresourcequota_selector{name="quota1",type="label",key="tier",operator="In",values="cache2,cache3"} 1
+		openshift_clusterresourcequota_selector{name="quota1",type="label",key="tier2",operator="DoesNotExist",values=""} 1
+`,
+			MetricNames: []string{"openshift_clusterresourcequota_created", "openshift_clusterresourcequota_selector", "openshift_clusterresourcequota_labels", "openshift_clusterresourcequota_usage"},
+		},
+
 		{
 			Obj: &v1.ClusterResourceQuota{
 				ObjectMeta: metav1.ObjectMeta{
@@ -63,12 +107,12 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 							corev1.ResourceCPU: resource.MustParse("4.3"),
 						},
 					},
-					Selector: v1.ClusterResourceQuotaSelector {
-						AnnotationSelector : map[string]string{},
-						LabelSelector : &metav1.LabelSelector{
-								MatchLabels: map[string]string{"clusterquota": "labeltest"},
+					Selector: v1.ClusterResourceQuotaSelector{
+						AnnotationSelector: map[string]string{},
+						LabelSelector: &metav1.LabelSelector{
+							MatchLabels: map[string]string{"clusterquota": "labeltest"},
 						},
-					},	
+					},
 				},
 				Status: v1.ClusterResourceQuotaStatus{
 					Total: corev1.ResourceQuotaStatus{},
@@ -77,7 +121,7 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 			Want: `
 		openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
 		openshift_clusterresourcequota_labels{name="quota1"} 1
-        openshift_clusterresourcequota_selector{name="quota1",type="label",key="clusterquota",value="labeltest"} 1
+        openshift_clusterresourcequota_selector{name="quota1",type="label",operator="In",key="clusterquota",values="labeltest"} 1
 		openshift_clusterresourcequota_usage{name="quota1",resource="cpu",type="hard"} 4.3
 `,
 
@@ -188,50 +232,50 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 				Spec: v1.ClusterResourceQuotaSpec{
 					Quota: corev1.ResourceQuotaSpec{
 						Hard: corev1.ResourceList{
-							corev1.ResourceMemory:                 resource.MustParse("2.1G"),
+							corev1.ResourceMemory: resource.MustParse("2.1G"),
 						},
 					},
-					Selector: v1.ClusterResourceQuotaSelector {
-						AnnotationSelector : map[string]string{
+					Selector: v1.ClusterResourceQuotaSelector{
+						AnnotationSelector: map[string]string{
 							"clusterquota": "test",
 						},
-						LabelSelector : &metav1.LabelSelector{},
-					},	
+						LabelSelector: &metav1.LabelSelector{},
+					},
 				},
 				Status: v1.ClusterResourceQuotaStatus{
 					Namespaces: []v1.ResourceQuotaStatusByNamespace{
-					    {
-						  Namespace: "myproject",
-						  Status: corev1.ResourceQuotaStatus{
-						  	Hard: corev1.ResourceList{
-						  		corev1.ResourceMemory:                 resource.MustParse("2.1G"),
-						  	},
-						  	Used: corev1.ResourceList{
-						  		corev1.ResourceMemory:                 resource.MustParse("500M"),
-						  	},
-						  },
-					    },
+						{
+							Namespace: "myproject",
+							Status: corev1.ResourceQuotaStatus{
+								Hard: corev1.ResourceList{
+									corev1.ResourceMemory: resource.MustParse("2.1G"),
+								},
+								Used: corev1.ResourceList{
+									corev1.ResourceMemory: resource.MustParse("500M"),
+								},
+							},
+						},
 					},
 					Total: corev1.ResourceQuotaStatus{
 						Hard: corev1.ResourceList{
-							corev1.ResourceMemory:                 resource.MustParse("2.1G"),
+							corev1.ResourceMemory: resource.MustParse("2.1G"),
 						},
 						Used: corev1.ResourceList{
-							corev1.ResourceMemory:                 resource.MustParse("500M"),
+							corev1.ResourceMemory: resource.MustParse("500M"),
 						},
 					},
 				},
 			},
 			Want: `
        	openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
-        openshift_clusterresourcequota_selector{name="quota1",type="annotation",key="clusterquota",value="test"} 1
+        openshift_clusterresourcequota_selector{name="quota1",type="annotation",key="clusterquota",values="test"} 1
 	    openshift_clusterresourcequota_usage{name="quota1",resource="memory",type="hard"} 2.1e+09
         openshift_clusterresourcequota_usage{name="quota1",resource="memory",type="used"} 5e+08		
-		openshift_clusterresourcequota_ns_usage{name="quota1",namespace="myproject",resource="memory",type="hard"} 2.1e+09
-        openshift_clusterresourcequota_ns_usage{name="quota1",namespace="myproject",resource="memory",type="used"} 5e+08		
+		openshift_clusterresourcequota_namespace_usage{name="quota1",namespace="myproject",resource="memory",type="hard"} 2.1e+09
+        openshift_clusterresourcequota_namespace_usage{name="quota1",namespace="myproject",resource="memory",type="used"} 5e+08		
 `,
 
-			MetricNames: []string{"openshift_clusterresourcequota_created", "openshift_clusterresourcequota_selector", "openshift_clusterresourcequota_usage", "openshift_clusterresourcequota_ns_usage"},
+			MetricNames: []string{"openshift_clusterresourcequota_created", "openshift_clusterresourcequota_selector", "openshift_clusterresourcequota_usage", "openshift_clusterresourcequota_namespace_usage"},
 		},
 	}
 
