@@ -125,20 +125,21 @@ var (
 				}
 
 				if sel.LabelSelector != nil {
-					labelKeys := []string{"type", "operator", "key", "values"}
+					labelKeys := []string{"type", "key", "value"}
 
 					for key, value := range sel.LabelSelector.MatchLabels {
 						f.Metrics = append(f.Metrics, &metric.Metric{
 							LabelKeys:   labelKeys,
-							LabelValues: []string{"label", "In", string(key), string(value)},
+							LabelValues: []string{"match-labels", string(key), string(value)},
 							Value:       float64(1),
 						})
 					}
 
+					labelKeys = []string{"type", "operator", "key", "values"}
 					for _, labelReq := range sel.LabelSelector.MatchExpressions {
 						f.Metrics = append(f.Metrics, &metric.Metric{
 							LabelKeys:   labelKeys,
-							LabelValues: []string{"label", string(labelReq.Operator), string(labelReq.Key), string(strings.Join(labelReq.Values, ","))},
+							LabelValues: []string{"match-expressions", string(labelReq.Operator), string(labelReq.Key), string(strings.Join(labelReq.Values, ","))},
 							Value:       float64(1),
 						})
 

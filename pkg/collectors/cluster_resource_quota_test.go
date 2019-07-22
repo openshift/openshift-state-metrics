@@ -88,8 +88,8 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 			Want: `
 		openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
 		openshift_clusterresourcequota_labels{label_quota="test",name="quota1"} 1
-		openshift_clusterresourcequota_selector{name="quota1",type="label",key="tier",operator="In",values="cache2,cache3"} 1
-		openshift_clusterresourcequota_selector{name="quota1",type="label",key="tier2",operator="DoesNotExist",values=""} 1
+		openshift_clusterresourcequota_selector{name="quota1",type="match-expressions",key="tier",operator="In",values="cache2,cache3"} 1
+		openshift_clusterresourcequota_selector{name="quota1",type="match-expressions",key="tier2",operator="DoesNotExist",values=""} 1
 `,
 			MetricNames: []string{"openshift_clusterresourcequota_created", "openshift_clusterresourcequota_selector", "openshift_clusterresourcequota_labels", "openshift_clusterresourcequota_usage"},
 		},
@@ -121,7 +121,7 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 			Want: `
 		openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
 		openshift_clusterresourcequota_labels{name="quota1"} 1
-        openshift_clusterresourcequota_selector{name="quota1",type="label",operator="In",key="clusterquota",values="labeltest"} 1
+        openshift_clusterresourcequota_selector{name="quota1",type="match-labels",key="clusterquota",value="labeltest"} 1
 		openshift_clusterresourcequota_usage{name="quota1",resource="cpu",type="hard"} 4.3
 `,
 
