@@ -268,7 +268,7 @@ func TestClusterResourceQuotaCollector(t *testing.T) {
 			},
 			Want: `
        	openshift_clusterresourcequota_created{name="quota1"} 1.5e+09
-        openshift_clusterresourcequota_selector{name="quota1",type="annotation",key="clusterquota",values="test"} 1
+        openshift_clusterresourcequota_selector{name="quota1",type="annotation",key="clusterquota",value="test"} 1
 	    openshift_clusterresourcequota_usage{name="quota1",resource="memory",type="hard"} 2.1e+09
         openshift_clusterresourcequota_usage{name="quota1",resource="memory",type="used"} 5e+08		
 		openshift_clusterresourcequota_namespace_usage{name="quota1",namespace="myproject",resource="memory",type="hard"} 2.1e+09
