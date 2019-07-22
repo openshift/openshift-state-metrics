@@ -7,6 +7,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kube-state-metrics/pkg/metric"
+	"strings"
 
 	"github.com/golang/glog"
 	"github.com/openshift/api/quota/v1"
@@ -57,7 +58,7 @@ var (
 			GenerateFunc: wrapClusterResourceQuotaFunc(func(r *v1.ClusterResourceQuota) metric.Family {
 				f := metric.Family{}
 
-				for res, qty := range r.Status.Total.Hard {
+				for res, qty := range r.Spec.Quota.Hard {
 					f.Metrics = append(f.Metrics, &metric.Metric{
 						LabelValues: []string{string(res), "hard"},
 						Value:       float64(qty.MilliValue()) / 1000,
@@ -72,6 +73,78 @@ var (
 
 				for _, m := range f.Metrics {
 					m.LabelKeys = []string{"resource", "type"}
+				}
+
+				return f
+			}),
+		},
+		metric.FamilyGenerator{
+			Name: "openshift_clusterresourcequota_namespace_usage",
+			Type: metric.MetricTypeGauge,
+			Help: "Usage about clusterresource quota per namespace.",
+			GenerateFunc: wrapClusterResourceQuotaFunc(func(r *v1.ClusterResourceQuota) metric.Family {
+				f := metric.Family{}
+
+				for _, rq := range r.Status.Namespaces {
+					for res, qty := range rq.Status.Hard {
+						f.Metrics = append(f.Metrics, &metric.Metric{
+							LabelValues: []string{string(rq.Namespace), string(res), "hard"},
+							Value:       float64(qty.MilliValue()) / 1000,
+						})
+					}
+					for res, qty := range rq.Status.Used {
+						f.Metrics = append(f.Metrics, &metric.Metric{
+							LabelValues: []string{string(rq.Namespace), string(res), "used"},
+							Value:       float64(qty.MilliValue()) / 1000,
+						})
+					}
+
+					for _, m := range f.Metrics {
+						m.LabelKeys = []string{"namespace", "resource", "type"}
+					}
+				}
+
+				return f
+			}),
+		},
+		metric.FamilyGenerator{
+			Name: "openshift_clusterresourcequota_selector",
+			Type: metric.MetricTypeGauge,
+			Help: "Selector of clusterresource quota, which defines the affected namespaces.",
+			GenerateFunc: wrapClusterResourceQuotaFunc(func(r *v1.ClusterResourceQuota) metric.Family {
+				f := metric.Family{}
+
+				sel := r.Spec.Selector
+				labelKeys := []string{"type", "key", "values"}
+				for key, value := range sel.AnnotationSelector {
+					f.Metrics = append(f.Metrics, &metric.Metric{
+						LabelKeys:   labelKeys,
+						LabelValues: []string{"annotation", string(key), string(value)},
+						Value:       float64(1),
+					})
+				}
+
+				if sel.LabelSelector != nil {
+					labelKeys := []string{"type", "key", "value"}
+
+					for key, value := range sel.LabelSelector.MatchLabels {
+						f.Metrics = append(f.Metrics, &metric.Metric{
+							LabelKeys:   labelKeys,
+							LabelValues: []string{"match-labels", string(key), string(value)},
+							Value:       float64(1),
+						})
+					}
+
+					labelKeys = []string{"type", "operator", "key", "values"}
+					for _, labelReq := range sel.LabelSelector.MatchExpressions {
+						f.Metrics = append(f.Metrics, &metric.Metric{
+							LabelKeys:   labelKeys,
+							LabelValues: []string{"match-expressions", string(labelReq.Operator), string(labelReq.Key), string(strings.Join(labelReq.Values, ","))},
+							Value:       float64(1),
+						})
+
+					}
+
 				}
 
 				return f
