@@ -1,13 +1,14 @@
 package collectors
 
 import (
+	"strings"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kube-state-metrics/pkg/metric"
-	"strings"
 
 	"github.com/golang/glog"
 	"github.com/openshift/api/quota/v1"
@@ -115,7 +116,7 @@ var (
 				f := metric.Family{}
 
 				sel := r.Spec.Selector
-				labelKeys := []string{"type", "key", "values"}
+				labelKeys := []string{"type", "key", "value"}
 				for key, value := range sel.AnnotationSelector {
 					f.Metrics = append(f.Metrics, &metric.Metric{
 						LabelKeys:   labelKeys,
