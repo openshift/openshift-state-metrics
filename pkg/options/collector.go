@@ -13,6 +13,7 @@ func init() {
 	koptions.DefaultCollectors["builds"] = struct{}{}
 	koptions.DefaultCollectors["clusterresourcequotas"] = struct{}{}
 	koptions.DefaultCollectors["routes"] = struct{}{}
+	koptions.DefaultCollectors["groups"] = struct{}{}
 }
 
 var (
@@ -23,5 +24,6 @@ var (
 		"builds":                struct{}{},
 		"clusterresourcequotas": struct{}{},
 		"routes":                struct{}{},
+		"groups":                struct{}{},
 	}
 )

@@ -102,6 +102,13 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
                          ]) +
                          rulesType.withVerbs(['list', 'watch']);
 
+      local groupRule = rulesType.new() +
+                               rulesType.withApiGroups(['user.openshift.io']) +
+                               rulesType.withResources([
+                                 'groups',
+                               ]) +
+                               rulesType.withVerbs(['list', 'watch']);
+
       local authenticationRole = rulesType.new() +
                                  rulesType.withApiGroups(['authentication.k8s.io']) +
                                  rulesType.withResources([
@@ -116,7 +123,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
                                 ]) +
                                 rulesType.withVerbs(['create']);
 
-      local rules = [appsRule, buildRule, quotaRule, routeRule, authenticationRole, authorizationRole];
+      local rules = [appsRule, buildRule, quotaRule, routeRule, groupRule, authenticationRole, authorizationRole];
 
       clusterRole.new() +
       clusterRole.mixin.metadata.withName('openshift-state-metrics') +

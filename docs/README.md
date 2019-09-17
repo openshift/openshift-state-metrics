@@ -29,6 +29,7 @@ Per group of metrics there is one file for each metrics. See each file for speci
 - [DeploymentConfig Metrics](deploymentconfig-metrics.md)
 - [ClusterResourceQuota Metrics](clusterresourcequota-metrics.md)
 - [Route Metrics](route-metrics.md)
+- [Group Metrics](group-metrics.md)
 
 ## CLI Arguments
 
