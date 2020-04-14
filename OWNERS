@@ -1,9 +1,21 @@
+component: "Monitoring"
+
 reviewers:
 - wanghaoran1988
 - aditya-konarde
 - BlueShells
+- pgier
+- simonpasquier
+- s-urbaniak
+- LiliC
+- paulfanton
 
 approvers:
 - wanghaoran1988
 - aditya-konarde
 - BlueShells
+- pgier
+- simonpasquier
+- s-urbaniak
+- LiliC
+- paulfanton
