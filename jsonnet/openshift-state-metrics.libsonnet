@@ -9,7 +9,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       scrapeInterval: '30s',
       scrapeTimeout: '30s',
 
-      baseCPU: '100m',
+      baseCPU: '1m',
       baseMemory: '150Mi',
       cpuPerNode: '2m',
       memoryPerNode: '30Mi',
@@ -153,7 +153,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
           '--tls-private-key-file=/etc/tls/private/tls.key',
         ]) +
         container.withPorts(containerPort.newNamed(8443, 'https-main')) +
-        container.mixin.resources.withRequests({ cpu: '10m', memory: '20Mi' }) +
+        container.mixin.resources.withRequests({ cpu: '1m', memory: '20Mi' }) +
         container.mixin.resources.withLimits({ cpu: '20m', memory: '40Mi' }) +
         container.withVolumeMounts([privateVolumeMount]);
 
@@ -169,7 +169,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
         ]) +
         container.withVolumeMounts([privateVolumeMount]) +
         container.withPorts(containerPort.newNamed(9443,'https-self')) +
-        container.mixin.resources.withRequests({ cpu: '10m', memory: '20Mi' }) +
+        container.mixin.resources.withRequests({ cpu: '1m', memory: '20Mi' }) +
         container.mixin.resources.withLimits({ cpu: '20m', memory: '40Mi' });
 
       local openshiftStateMetrics =
