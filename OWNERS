@@ -2,7 +2,6 @@ component: "Monitoring"
 
 reviewers:
 - wanghaoran1988
-- aditya-konarde
 - BlueShells
 - pgier
 - simonpasquier
@@ -12,7 +11,6 @@ reviewers:
 
 approvers:
 - wanghaoran1988
-- aditya-konarde
 - BlueShells
 - pgier
 - simonpasquier
