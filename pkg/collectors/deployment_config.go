@@ -1,6 +1,8 @@
 package collectors
 
 import (
+	"context"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -12,7 +14,7 @@ import (
 
 	"github.com/golang/glog"
 
-	"github.com/openshift/api/apps/v1"
+	v1 "github.com/openshift/api/apps/v1"
 	appsclient "github.com/openshift/client-go/apps/clientset/versioned"
 )
 
@@ -216,10 +218,10 @@ func createDeploymentListWatch(apiserver string, kubeconfig string, ns string) c
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return appsclient.AppsV1().DeploymentConfigs(ns).List(opts)
+			return appsclient.AppsV1().DeploymentConfigs(ns).List(context.TODO(), opts)
 		},
 		WatchFunc: func(opts metav1.ListOptions) (watch.Interface, error) {
-			return appsclient.AppsV1().DeploymentConfigs(ns).Watch(opts)
+			return appsclient.AppsV1().DeploymentConfigs(ns).Watch(context.TODO(), opts)
 		},
 	}
 }

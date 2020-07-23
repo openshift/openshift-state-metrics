@@ -1,6 +1,7 @@
 package collectors
 
 import (
+	"context"
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,7 +12,7 @@ import (
 	"k8s.io/kube-state-metrics/pkg/metric"
 
 	"github.com/golang/glog"
-	"github.com/openshift/api/quota/v1"
+	v1 "github.com/openshift/api/quota/v1"
 	quotaclient "github.com/openshift/client-go/quota/clientset/versioned"
 	"k8s.io/kube-state-metrics/pkg/version"
 )
@@ -176,10 +177,10 @@ func createClusterResourceQuotaListWatch(apiserver string, kubeconfig string, ns
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return quotaclient.QuotaV1().ClusterResourceQuotas().List(opts)
+			return quotaclient.QuotaV1().ClusterResourceQuotas().List(context.TODO(), opts)
 		},
 		WatchFunc: func(opts metav1.ListOptions) (watch.Interface, error) {
-			return quotaclient.QuotaV1().ClusterResourceQuotas().Watch(opts)
+			return quotaclient.QuotaV1().ClusterResourceQuotas().Watch(context.TODO(), opts)
 		},
 	}
 }

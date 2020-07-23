@@ -1,6 +1,8 @@
 package collectors
 
 import (
+	"context"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -11,7 +13,7 @@ import (
 
 	"github.com/golang/glog"
 
-	"github.com/openshift/api/user/v1"
+	v1 "github.com/openshift/api/user/v1"
 	groupclient "github.com/openshift/client-go/user/clientset/versioned"
 )
 
@@ -81,10 +83,10 @@ func createGroupListWatch(apiserver string, kubeconfig string, ns string) cache.
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return groupclient.UserV1().Groups().List(opts)
+			return groupclient.UserV1().Groups().List(context.TODO(), opts)
 		},
 		WatchFunc: func(opts metav1.ListOptions) (watch.Interface, error) {
-			return groupclient.UserV1().Groups().Watch(opts)
+			return groupclient.UserV1().Groups().Watch(context.TODO(), opts)
 		},
 	}
 }
