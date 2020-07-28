@@ -19,6 +19,15 @@ rules:
   - list
   - watch
 - apiGroups:
+  - config.openshift.io
+  resources:
+  - infrastructures
+  - featuregates
+  - proxies
+  verbs:
+  - list
+  - watch
+- apiGroups:
   - quota.openshift.io
   resources:
   - clusterresourcequotas

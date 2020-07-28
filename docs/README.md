@@ -26,6 +26,7 @@ Per group of metrics there is one file for each metrics. See each file for speci
 
 - [BuildConfig Metrics](buildconfig-metrics.md)
 - [Build Metrics](build-metrics.md)
+- [Config Metrics](config-metrics.md)
 - [DeploymentConfig Metrics](deploymentconfig-metrics.md)
 - [ClusterResourceQuota Metrics](clusterresourcequota-metrics.md)
 - [Route Metrics](route-metrics.md)

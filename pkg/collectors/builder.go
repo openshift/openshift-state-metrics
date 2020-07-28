@@ -14,6 +14,7 @@ import (
 	"github.com/golang/glog"
 	appsv1 "github.com/openshift/api/apps/v1"
 	buildv1 "github.com/openshift/api/build/v1"
+	configv1 "github.com/openshift/api/config/v1"
 	quotav1 "github.com/openshift/api/quota/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	userv1 "github.com/openshift/api/user/v1"
@@ -114,6 +115,9 @@ var availableCollectors = map[string]func(f *Builder) *collector.Collector{
 	"clusterresourcequotas": func(b *Builder) *collector.Collector { return b.buildQuotaCollector() },
 	"routes":                func(b *Builder) *collector.Collector { return b.buildRouteCollector() },
 	"groups":                func(b *Builder) *collector.Collector { return b.buildGroupCollector() },
+	"infrastructures":       func(b *Builder) *collector.Collector { return b.buildInfrastructureCollector() },
+	"featuresets":           func(b *Builder) *collector.Collector { return b.buildFeatureSetCollector() },
+	"proxies":               func(b *Builder) *collector.Collector { return b.buildProxyCollector() },
 }
 
 func (b *Builder) buildRouteCollector() *collector.Collector {
@@ -212,6 +216,54 @@ func (b *Builder) buildGroupCollector() *collector.Collector {
 	return collector.NewCollector(store)
 }
 
+func (b *Builder) buildInfrastructureCollector() *collector.Collector {
+	filteredMetricFamilies := metric.FilterMetricFamilies(b.whiteBlackList, infrastructureMetricFamilies)
+	composedMetricGenFuncs := metric.ComposeMetricGenFuncs(filteredMetricFamilies)
+
+	familyHeaders := metric.ExtractMetricFamilyHeaders(filteredMetricFamilies)
+
+	store := metricsstore.NewMetricsStore(
+		familyHeaders,
+		composedMetricGenFuncs,
+	)
+
+	reflector(b.ctx, &configv1.Infrastructure{}, store, b.apiserver, b.kubeconfig, createInfrastructureListWatch)
+
+	return collector.NewCollector(store)
+}
+
+func (b *Builder) buildFeatureSetCollector() *collector.Collector {
+	filteredMetricFamilies := metric.FilterMetricFamilies(b.whiteBlackList, featureSetMetricFamilies)
+	composedMetricGenFuncs := metric.ComposeMetricGenFuncs(filteredMetricFamilies)
+
+	familyHeaders := metric.ExtractMetricFamilyHeaders(filteredMetricFamilies)
+
+	store := metricsstore.NewMetricsStore(
+		familyHeaders,
+		composedMetricGenFuncs,
+	)
+
+	reflector(b.ctx, &configv1.FeatureGate{}, store, b.apiserver, b.kubeconfig, createFeatureGateListWatch)
+
+	return collector.NewCollector(store)
+}
+
+func (b *Builder) buildProxyCollector() *collector.Collector {
+	filteredMetricFamilies := metric.FilterMetricFamilies(b.whiteBlackList, proxyMetricFamilies)
+	composedMetricGenFuncs := metric.ComposeMetricGenFuncs(filteredMetricFamilies)
+
+	familyHeaders := metric.ExtractMetricFamilyHeaders(filteredMetricFamilies)
+
+	store := metricsstore.NewMetricsStore(
+		familyHeaders,
+		composedMetricGenFuncs,
+	)
+
+	reflector(b.ctx, &configv1.Proxy{}, store, b.apiserver, b.kubeconfig, createProxyListWatch)
+
+	return collector.NewCollector(store)
+}
+
 // reflectorPerNamespace creates a Kubernetes client-go reflector with the given
 // listWatchFunc for each given namespace and registers it with the given store.
 func reflectorPerNamespace(
@@ -228,4 +280,20 @@ func reflectorPerNamespace(
 		reflector := cache.NewReflector(&lw, expectedType, store, 0)
 		go reflector.Run(ctx.Done())
 	}
+}
+
+// reflector creates a Kubernetes client-go reflector with the given listWatchFunc registers it with the given store.
+// reflector is cluster-scoped
+func reflector(
+	ctx context.Context,
+	expectedType interface{},
+	store cache.Store,
+	apiserver string,
+	kubeconfig string,
+	listWatchFunc func(apiserver string, kubeconfig string) cache.ListWatch,
+) {
+	lw := listWatchFunc(apiserver, kubeconfig)
+	reflector := cache.NewReflector(&lw, expectedType, store, 0)
+	go reflector.Run(ctx.Done())
+
 }
