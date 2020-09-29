@@ -1,6 +1,8 @@
 package collectors
 
 import (
+	"context"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -156,10 +158,10 @@ func createBuildListWatch(apiserver string, kubeconfig string, ns string) cache.
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return buildclient.BuildV1().Builds(ns).List(opts)
+			return buildclient.BuildV1().Builds(ns).List(context.TODO(), opts)
 		},
 		WatchFunc: func(opts metav1.ListOptions) (watch.Interface, error) {
-			return buildclient.BuildV1().Builds(ns).Watch(opts)
+			return buildclient.BuildV1().Builds(ns).Watch(context.TODO(), opts)
 		},
 	}
 }
