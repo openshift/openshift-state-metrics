@@ -12,7 +12,7 @@ import (
 	"k8s.io/kube-state-metrics/pkg/metric"
 	"k8s.io/kube-state-metrics/pkg/version"
 
-	"github.com/golang/glog"
+	"k8s.io/klog/v2"
 
 	v1 "github.com/openshift/api/apps/v1"
 	appsclient "github.com/openshift/client-go/apps/clientset/versioned"
@@ -214,7 +214,7 @@ func wrapDeploymentFunc(f func(*v1.DeploymentConfig) metric.Family) func(interfa
 func createDeploymentListWatch(apiserver string, kubeconfig string, ns string) cache.ListWatch {
 	appsclient, err := createAppsClient(apiserver, kubeconfig)
 	if err != nil {
-		glog.Fatalf("cannot create deploymentconfig client: %v", err)
+		klog.Fatalf("cannot create deploymentconfig client: %v", err)
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
