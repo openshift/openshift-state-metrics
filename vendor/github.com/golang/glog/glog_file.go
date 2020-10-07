@@ -16,15 +16,15 @@
 
 // File I/O for logs.
 
-package klog
+package glog
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -36,57 +36,37 @@ var MaxSize uint64 = 1024 * 1024 * 1800
 // logDirs lists the candidate directories for new log files.
 var logDirs []string
 
+// If non-empty, overrides the choice of directory in which to write logs.
+// See createLogDirs for the full list of possible destinations.
+var logDir = flag.String("log_dir", "", "If non-empty, write log files in this directory")
+
 func createLogDirs() {
-	if logging.logDir != "" {
-		logDirs = append(logDirs, logging.logDir)
+	if *logDir != "" {
+		logDirs = append(logDirs, *logDir)
 	}
 	logDirs = append(logDirs, os.TempDir())
 }
 
 var (
-	pid          = os.Getpid()
-	program      = filepath.Base(os.Args[0])
-	host         = "unknownhost"
-	userName     = "unknownuser"
-	userNameOnce sync.Once
+	pid      = os.Getpid()
+	program  = filepath.Base(os.Args[0])
+	host     = "unknownhost"
+	userName = "unknownuser"
 )
 
 func init() {
-	if h, err := os.Hostname(); err == nil {
+	h, err := os.Hostname()
+	if err == nil {
 		host = shortHostname(h)
 	}
-}
 
-func getUserName() string {
-	userNameOnce.Do(func() {
-		// On Windows, the Go 'user' package requires netapi32.dll.
-		// This affects Windows Nano Server:
-		//   https://github.com/golang/go/issues/21867
-		// Fallback to using environment variables.
-		if runtime.GOOS == "windows" {
-			u := os.Getenv("USERNAME")
-			if len(u) == 0 {
-				return
-			}
-			// Sanitize the USERNAME since it may contain filepath separators.
-			u = strings.Replace(u, `\`, "_", -1)
+	current, err := user.Current()
+	if err == nil {
+		userName = current.Username
+	}
 
-			// user.Current().Username normally produces something like 'USERDOMAIN\USERNAME'
-			d := os.Getenv("USERDOMAIN")
-			if len(d) != 0 {
-				userName = d + "_" + u
-			} else {
-				userName = u
-			}
-		} else {
-			current, err := user.Current()
-			if err == nil {
-				userName = current.Username
-			}
-		}
-	})
-
-	return userName
+	// Sanitize userName since it may contain filepath separators on Windows.
+	userName = strings.Replace(userName, `\`, "_", -1)
 }
 
 // shortHostname returns its argument, truncating at the first period.
@@ -104,7 +84,7 @@ func logName(tag string, t time.Time) (name, link string) {
 	name = fmt.Sprintf("%s.%s.%s.log.%s.%04d%02d%02d-%02d%02d%02d.%d",
 		program,
 		host,
-		getUserName(),
+		userName,
 		tag,
 		t.Year(),
 		t.Month(),
@@ -122,16 +102,7 @@ var onceLogDirs sync.Once
 // contains tag ("INFO", "FATAL", etc.) and t.  If the file is created
 // successfully, create also attempts to update the symlink for that tag, ignoring
 // errors.
-// The startup argument indicates whether this is the initial startup of klog.
-// If startup is true, existing files are opened for appending instead of truncated.
-func create(tag string, t time.Time, startup bool) (f *os.File, filename string, err error) {
-	if logging.logFile != "" {
-		f, err := openOrCreate(logging.logFile, startup)
-		if err == nil {
-			return f, logging.logFile, nil
-		}
-		return nil, "", fmt.Errorf("log: unable to create log: %v", err)
-	}
+func create(tag string, t time.Time) (f *os.File, filename string, err error) {
 	onceLogDirs.Do(createLogDirs)
 	if len(logDirs) == 0 {
 		return nil, "", errors.New("log: no log dirs")
@@ -140,7 +111,7 @@ func create(tag string, t time.Time, startup bool) (f *os.File, filename string,
 	var lastErr error
 	for _, dir := range logDirs {
 		fname := filepath.Join(dir, name)
-		f, err := openOrCreate(fname, startup)
+		f, err := os.Create(fname)
 		if err == nil {
 			symlink := filepath.Join(dir, link)
 			os.Remove(symlink)        // ignore err
@@ -150,15 +121,4 @@ func create(tag string, t time.Time, startup bool) (f *os.File, filename string,
 		lastErr = err
 	}
 	return nil, "", fmt.Errorf("log: cannot create log: %v", lastErr)
-}
-
-// The startup argument indicates whether this is the initial startup of klog.
-// If startup is true, existing files are opened for appending instead of truncated.
-func openOrCreate(name string, startup bool) (*os.File, error) {
-	if startup {
-		f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		return f, err
-	}
-	f, err := os.Create(name)
-	return f, err
 }

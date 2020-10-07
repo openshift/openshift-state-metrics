@@ -11,13 +11,13 @@ import (
 
 	"k8s.io/client-go/tools/cache"
 
+	"github.com/golang/glog"
 	appsv1 "github.com/openshift/api/apps/v1"
 	buildv1 "github.com/openshift/api/build/v1"
 	quotav1 "github.com/openshift/api/quota/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	userv1 "github.com/openshift/api/user/v1"
 	"golang.org/x/net/context"
-	"k8s.io/klog/v2"
 )
 
 type whiteBlackLister interface {
@@ -93,7 +93,7 @@ func (b *Builder) Build() []*collector.Collector {
 	for _, c := range b.enabledCollectors {
 		constructor, ok := availableCollectors[c]
 		if !ok {
-			klog.Fatalf("collector %s is not correct", c)
+			glog.Fatalf("collector %s is not correct", c)
 		}
 
 		collector := constructor(b)
@@ -102,7 +102,7 @@ func (b *Builder) Build() []*collector.Collector {
 
 	}
 
-	klog.Infof("Active collectors: %s", strings.Join(activeCollectorNames, ","))
+	glog.Infof("Active collectors: %s", strings.Join(activeCollectorNames, ","))
 
 	return collectors
 }
