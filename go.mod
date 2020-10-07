@@ -3,7 +3,6 @@ module github.com/openshift/openshift-state-metrics
 go 1.14
 
 require (
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/openshift/api v0.0.0-20200623075207-eb651a5bb0ad
 	github.com/openshift/client-go v0.0.0-20200623090625-83993cebb5ae
 	github.com/openshift/origin v4.1.0+incompatible
@@ -13,5 +12,6 @@ require (
 	k8s.io/api v0.18.8
 	k8s.io/apimachinery v0.18.8
 	k8s.io/client-go v0.18.8
+	k8s.io/klog/v2 v2.3.0
 	k8s.io/kube-state-metrics v0.0.0-20190129120824-7bfed92869b6
 )
