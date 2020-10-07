@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/kube-state-metrics/pkg/metric"
 
-	"github.com/golang/glog"
+	"k8s.io/klog/v2"
 
 	v1 "github.com/openshift/api/build/v1"
 )
@@ -175,7 +175,7 @@ func determineBuildConfig(build *v1.Build) string {
 func createBuildListWatch(apiserver string, kubeconfig string, ns string) cache.ListWatch {
 	buildclient, err := createBuildClient(apiserver, kubeconfig)
 	if err != nil {
-		glog.Fatalf("cannot create build client: %v", err)
+		klog.Fatalf("cannot create build client: %v", err)
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

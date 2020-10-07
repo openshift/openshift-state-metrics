@@ -11,9 +11,9 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/kube-state-metrics/pkg/metric"
 
-	"github.com/golang/glog"
 	v1 "github.com/openshift/api/quota/v1"
 	quotaclient "github.com/openshift/client-go/quota/clientset/versioned"
+	"k8s.io/klog/v2"
 	"k8s.io/kube-state-metrics/pkg/version"
 )
 
@@ -173,7 +173,7 @@ func wrapClusterResourceQuotaFunc(f func(config *v1.ClusterResourceQuota) metric
 func createClusterResourceQuotaListWatch(apiserver string, kubeconfig string, ns string) cache.ListWatch {
 	quotaclient, err := createClusterResourceQuotaClient(apiserver, kubeconfig)
 	if err != nil {
-		glog.Fatalf("cannot create quota client: %v", err)
+		klog.Fatalf("cannot create quota client: %v", err)
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
