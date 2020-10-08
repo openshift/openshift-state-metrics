@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"k8s.io/klog"
 	koptions "k8s.io/kube-state-metrics/pkg/options"
 )
 
@@ -39,8 +40,10 @@ func NewOptions() *Options {
 
 func (o *Options) AddFlags() {
 	o.flags = pflag.NewFlagSet("", pflag.ExitOnError)
-	// add glog flags
-	o.flags.AddGoFlagSet(flag.CommandLine)
+	// add klog flags
+	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
+	klog.InitFlags(klogFlags)
+	o.flags.AddGoFlagSet(klogFlags)
 	o.flags.Lookup("logtostderr").Value.Set("true")
 	o.flags.Lookup("logtostderr").DefValue = "true"
 	o.flags.Lookup("logtostderr").NoOptDefVal = "true"

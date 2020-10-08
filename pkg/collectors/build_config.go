@@ -11,7 +11,7 @@ import (
 	"k8s.io/kube-state-metrics/pkg/metric"
 	"k8s.io/kube-state-metrics/pkg/version"
 
-	"github.com/golang/glog"
+	"k8s.io/klog/v2"
 
 	v1 "github.com/openshift/api/build/v1"
 	buildclient "github.com/openshift/client-go/build/clientset/versioned"
@@ -108,7 +108,7 @@ func wrapBuildConfigFunc(f func(config *v1.BuildConfig) metric.Family) func(inte
 func createBuildConfigListWatch(apiserver string, kubeconfig string, ns string) cache.ListWatch {
 	buildclient, err := createBuildClient(apiserver, kubeconfig)
 	if err != nil {
-		glog.Fatalf("cannot create buildconfig client: %v", err)
+		klog.Fatalf("cannot create buildconfig client: %v", err)
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

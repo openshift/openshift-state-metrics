@@ -13,10 +13,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/glog"
 	"github.com/openshift/origin/pkg/util/proc"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"k8s.io/klog/v2"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
@@ -38,7 +38,7 @@ const (
 type promLogger struct{}
 
 func (pl promLogger) Println(v ...interface{}) {
-	glog.Error(v...)
+	klog.Error(v...)
 }
 
 func main() {
@@ -47,7 +47,7 @@ func main() {
 
 	err := opts.Parse()
 	if err != nil {
-		glog.Fatalf("Error: %s", err)
+		klog.Fatalf("Error: %s", err)
 	}
 
 	if opts.Version {
@@ -63,37 +63,37 @@ func main() {
 	collectorBuilder := ocollectors.NewBuilder(context.TODO())
 	collectorBuilder.WithApiserver(opts.Apiserver).WithKubeConfig(opts.Kubeconfig)
 	if len(opts.Collectors) == 0 {
-		glog.Info("Using default collectors")
+		klog.Info("Using default collectors")
 		collectorBuilder.WithEnabledCollectors(options.DefaultCollectors.AsSlice())
 	} else {
 		collectorBuilder.WithEnabledCollectors(opts.Collectors.AsSlice())
 	}
 
 	if len(opts.Namespaces) == 0 {
-		glog.Info("Using all namespace")
+		klog.Info("Using all namespace")
 		collectorBuilder.WithNamespaces(koptions.DefaultNamespaces)
 	} else {
 		if opts.Namespaces.IsAllNamespaces() {
-			glog.Info("Using all namespace")
+			klog.Info("Using all namespace")
 		} else {
-			glog.Infof("Using %s namespaces", opts.Namespaces)
+			klog.Infof("Using %s namespaces", opts.Namespaces)
 		}
 		collectorBuilder.WithNamespaces(opts.Namespaces)
 	}
 
 	whiteBlackList, err := whiteblacklist.New(opts.MetricWhitelist, opts.MetricBlacklist)
 	if err != nil {
-		glog.Fatal(err)
+		klog.Fatal(err)
 	}
 
-	glog.Infof("metric white- blacklisting: %v", whiteBlackList.Status())
+	klog.Infof("metric white- blacklisting: %v", whiteBlackList.Status())
 
 	collectorBuilder.WithWhiteBlackList(whiteBlackList)
 
 	proc.StartReaper()
 
 	if err != nil {
-		glog.Fatalf("Failed to create client: %v", err)
+		klog.Fatalf("Failed to create client: %v", err)
 	}
 
 	osMetricsRegistry := prometheus.NewRegistry()
@@ -111,7 +111,7 @@ func telemetryServer(registry prometheus.Gatherer, host string, port int) {
 	// Address to listen on for web interface and telemetry
 	listenAddress := net.JoinHostPort(host, strconv.Itoa(port))
 
-	glog.Infof("Starting openshift-state-metrics self metrics server: %s", listenAddress)
+	klog.Infof("Starting openshift-state-metrics self metrics server: %s", listenAddress)
 
 	mux := http.NewServeMux()
 
@@ -137,7 +137,7 @@ func serveMetrics(collectors []*kcollectors.Collector, host string, port int, en
 	// Address to listen on for web interface and telemetry
 	listenAddress := net.JoinHostPort(host, strconv.Itoa(port))
 
-	glog.Infof("Starting metrics server: %s", listenAddress)
+	klog.Infof("Starting metrics server: %s", listenAddress)
 
 	mux := http.NewServeMux()
 
