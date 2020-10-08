@@ -1,9 +1,9 @@
-FROM registry.svc.ci.openshift.org/ocp/builder:rhel-8-golang-1.15-openshift-4.6 AS builder
+FROM registry.svc.ci.openshift.org/ocp/builder:rhel-8-golang-1.15-openshift-4.7 AS builder
 WORKDIR /go/src/github.com/openshift/openshift-state-metrics
 COPY . .
 RUN make build
 
-FROM  registry.svc.ci.openshift.org/ocp/4.6:base
+FROM registry.svc.ci.openshift.org/ocp/4.7:base
 LABEL io.k8s.display-name="openshift-state-metrics" \
       io.k8s.description="This is a component that exposes metrics about OpenShift objects." \
       io.openshift.tags="OpenShift" \
