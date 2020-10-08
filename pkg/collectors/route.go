@@ -12,7 +12,7 @@ import (
 	"k8s.io/kube-state-metrics/pkg/metric"
 	"k8s.io/kube-state-metrics/pkg/version"
 
-	"github.com/golang/glog"
+	"k8s.io/klog/v2"
 
 	v1 "github.com/openshift/api/route/v1"
 	routeclient "github.com/openshift/client-go/route/clientset/versioned"
@@ -129,7 +129,7 @@ func wrapRouteFunc(f func(*v1.Route) metric.Family) func(interface{}) metric.Fam
 func createRouteListWatch(apiserver string, kubeconfig string, ns string) cache.ListWatch {
 	routesclient, err := createRouteClient(apiserver, kubeconfig)
 	if err != nil {
-		glog.Fatalf("cannot create Route client: %v", err)
+		klog.Fatalf("cannot create Route client: %v", err)
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {

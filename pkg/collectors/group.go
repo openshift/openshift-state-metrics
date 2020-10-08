@@ -11,7 +11,7 @@ import (
 	"k8s.io/kube-state-metrics/pkg/metric"
 	"k8s.io/kube-state-metrics/pkg/version"
 
-	"github.com/golang/glog"
+	"k8s.io/klog/v2"
 
 	v1 "github.com/openshift/api/user/v1"
 	groupclient "github.com/openshift/client-go/user/clientset/versioned"
@@ -79,7 +79,7 @@ func wrapGroupFunc(f func(group *v1.Group) metric.Family) func(interface{}) metr
 func createGroupListWatch(apiserver string, kubeconfig string, ns string) cache.ListWatch {
 	groupclient, err := createGroupClient(apiserver, kubeconfig)
 	if err != nil {
-		glog.Fatalf("cannot create Group client: %v", err)
+		klog.Fatalf("cannot create Group client: %v", err)
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
