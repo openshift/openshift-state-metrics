@@ -201,8 +201,6 @@ github.com/openshift/api v0.0.0-20200623075207-eb651a5bb0ad/go.mod h1:l6TGeqJ92D
 github.com/openshift/build-machinery-go v0.0.0-20200424080330-082bf86082cc/go.mod h1:1CkcsT3aVebzRBzVTSbiKSkJMsC/CASqxesfqEMfJEc=
 github.com/openshift/client-go v0.0.0-20200623090625-83993cebb5ae h1:3NJm9lI7FV4ZU3BFmATM61zfTqwLk+11kuyDCyxceW4=
 github.com/openshift/client-go v0.0.0-20200623090625-83993cebb5ae/go.mod h1:6GlTOU9aZVIQI8mF5W6Pgc+zVHpMc2V486sxD2cd8t4=
-github.com/openshift/origin v4.1.0+incompatible h1:sdf+1/92CKR24IqOR/o4IBsJCku8/ddu/bAesnnh1Nw=
-github.com/openshift/origin v4.1.0+incompatible/go.mod h1:0Rox5r9C8aQn6j1oAOQ0c1uC86mYbUFObzjBRvUKHII=
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
