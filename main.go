@@ -13,13 +13,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/openshift/origin/pkg/util/proc"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"k8s.io/klog/v2"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
+	"github.com/openshift/openshift-state-metrics/pkg/proc"
 	"github.com/openshift/openshift-state-metrics/pkg/version"
 	kcollectors "k8s.io/kube-state-metrics/pkg/collector"
 	koptions "k8s.io/kube-state-metrics/pkg/options"

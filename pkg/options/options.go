@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 	koptions "k8s.io/kube-state-metrics/pkg/options"
 )
 
