@@ -1,6 +1,7 @@
 package collectors
 
 import (
+	"context"
 	"strconv"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -132,10 +133,10 @@ func createRouteListWatch(apiserver string, kubeconfig string, ns string) cache.
 	}
 	return cache.ListWatch{
 		ListFunc: func(opts metav1.ListOptions) (runtime.Object, error) {
-			return routesclient.RouteV1().Routes(ns).List(opts)
+			return routesclient.RouteV1().Routes(ns).List(context.TODO(), opts)
 		},
 		WatchFunc: func(opts metav1.ListOptions) (watch.Interface, error) {
-			return routesclient.RouteV1().Routes(ns).Watch(opts)
+			return routesclient.RouteV1().Routes(ns).Watch(context.TODO(), opts)
 		},
 	}
 }

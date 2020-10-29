@@ -99,7 +99,7 @@ func main() {
 	osMetricsRegistry := prometheus.NewRegistry()
 	osMetricsRegistry.Register(ocollectors.ResourcesPerScrapeMetric)
 	osMetricsRegistry.Register(ocollectors.ScrapeErrorTotalMetric)
-	osMetricsRegistry.Register(prometheus.NewProcessCollector(os.Getpid(), ""))
+	osMetricsRegistry.Register(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
 	osMetricsRegistry.Register(prometheus.NewGoCollector())
 	go telemetryServer(osMetricsRegistry, opts.TelemetryHost, opts.TelemetryPort)
 
