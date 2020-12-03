@@ -3,17 +3,20 @@ component: "Monitoring"
 reviewers:
 - wanghaoran1988
 - BlueShells
-- pgier
 - simonpasquier
 - s-urbaniak
 - LiliC
 - paulfantom
+- dgrisonnet
 
 approvers:
 - wanghaoran1988
 - BlueShells
-- pgier
 - simonpasquier
 - s-urbaniak
 - LiliC
 - paulfantom
+- dgrisonnet
+
+emeritus_approvers:
+- pgier
