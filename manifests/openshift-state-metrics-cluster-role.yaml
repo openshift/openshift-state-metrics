@@ -51,3 +51,10 @@ rules:
   - subjectaccessreviews
   verbs:
   - create
+- apiGroups:
+    - ''
+  resources:
+    - replicationcontrollers
+  verbs:
+    - list
+    - watch

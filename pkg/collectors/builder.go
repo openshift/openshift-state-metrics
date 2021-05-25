@@ -6,7 +6,7 @@ import (
 
 	"k8s.io/kube-state-metrics/pkg/collector"
 	"k8s.io/kube-state-metrics/pkg/metric"
-	"k8s.io/kube-state-metrics/pkg/metrics_store"
+	metricsstore "k8s.io/kube-state-metrics/pkg/metrics_store"
 	"k8s.io/kube-state-metrics/pkg/options"
 
 	"k8s.io/client-go/tools/cache"
@@ -17,6 +17,7 @@ import (
 	routev1 "github.com/openshift/api/route/v1"
 	userv1 "github.com/openshift/api/user/v1"
 	"golang.org/x/net/context"
+	replicationcontrollerv1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 )
 
@@ -37,9 +38,7 @@ type Builder struct {
 }
 
 // NewBuilder returns a new builder.
-func NewBuilder(
-	ctx context.Context,
-) *Builder {
+func NewBuilder(ctx context.Context) *Builder {
 	return &Builder{
 		ctx: ctx,
 	}
@@ -114,6 +113,7 @@ var availableCollectors = map[string]func(f *Builder) *collector.Collector{
 	"clusterresourcequotas": func(b *Builder) *collector.Collector { return b.buildQuotaCollector() },
 	"routes":                func(b *Builder) *collector.Collector { return b.buildRouteCollector() },
 	"groups":                func(b *Builder) *collector.Collector { return b.buildGroupCollector() },
+	"replicationcontroller": func(b *Builder) *collector.Collector { return b.buildReplicationControllerCollector() },
 }
 
 func (b *Builder) buildRouteCollector() *collector.Collector {
@@ -208,6 +208,22 @@ func (b *Builder) buildGroupCollector() *collector.Collector {
 	)
 	reflectorPerNamespace(b.ctx, &userv1.Group{}, store,
 		b.apiserver, b.kubeconfig, b.namespaces, createGroupListWatch)
+
+	return collector.NewCollector(store)
+}
+
+func (b *Builder) buildReplicationControllerCollector() *collector.Collector {
+	filteredMetricFamilies := metric.FilterMetricFamilies(b.whiteBlackList, replicationControllerMetricFamilies)
+	composedMetricGenFuncs := metric.ComposeMetricGenFuncs(filteredMetricFamilies)
+
+	familyHeaders := metric.ExtractMetricFamilyHeaders(filteredMetricFamilies)
+
+	store := metricsstore.NewMetricsStore(
+		familyHeaders,
+		composedMetricGenFuncs,
+	)
+	reflectorPerNamespace(b.ctx, &replicationcontrollerv1.ReplicationController{}, store,
+		b.apiserver, b.kubeconfig, b.namespaces, createReplicationControllerListWatch)
 
 	return collector.NewCollector(store)
 }
