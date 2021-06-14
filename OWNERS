@@ -4,19 +4,35 @@ reviewers:
 - wanghaoran1988
 - BlueShells
 - simonpasquier
-- s-urbaniak
-- LiliC
 - paulfantom
 - dgrisonnet
+- slashpai
+- prashbnair
+- arajkumar
+- sthaha
+- PhilipGough
+- bison
+- fpetkovski
+- raptorsun
+- jan--f
 
 approvers:
 - wanghaoran1988
 - BlueShells
 - simonpasquier
-- s-urbaniak
-- LiliC
 - paulfantom
 - dgrisonnet
+- slashpai
+- prashbnair
+- arajkumar
+- sthaha
+- PhilipGough
+- bison
+- fpetkovski
+- raptorsun
+- jan--f
 
 emeritus_approvers:
 - pgier
+- s-urbaniak
+- LiliC
