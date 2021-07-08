@@ -14,7 +14,11 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       cpuPerNode: '2m',
       memoryPerNode: '30Mi',
     },
-
+    
+    commonLabels+:: {
+        'app.kubernetes.io/part-of': 'openshift-monitoring',
+    },
+    
     versions+:: {
       openshiftStateMetrics: '4.2',
       kubeRbacProxy: '4.2',
