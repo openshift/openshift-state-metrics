@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: openshift-state-metrics
     k8s-app: openshift-state-metrics
   name: openshift-state-metrics
   namespace: openshift-monitoring
@@ -9,10 +11,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: openshift-state-metrics
       k8s-app: openshift-state-metrics
   template:
     metadata:
       labels:
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/name: openshift-state-metrics
         k8s-app: openshift-state-metrics
     spec:
       containers:
