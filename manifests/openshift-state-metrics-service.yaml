@@ -19,4 +19,3 @@ spec:
   selector:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: openshift-state-metrics
-    k8s-app: openshift-state-metrics
