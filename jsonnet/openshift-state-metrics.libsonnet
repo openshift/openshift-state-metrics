@@ -14,7 +14,12 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       cpuPerNode: '2m',
       memoryPerNode: '30Mi',
     },
-
+    
+    commonLabels+:: {
+        'app.kubernetes.io/name': 'openshift-state-metrics',
+        'app.kubernetes.io/component': 'exporter',
+    },
+    
     versions+:: {
       openshiftStateMetrics: '4.2',
       kubeRbacProxy: '4.2',
@@ -135,7 +140,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       local containerVolumeMount = container.volumeMountsType;
       local podSelector = deployment.mixin.spec.template.spec.selectorType;
 
-      local podLabels = { 'k8s-app': 'openshift-state-metrics' };
+      local podLabels = $._config.commonLabels;
       local privateVolumeName = 'openshift-state-metrics-tls';
       local privateVolume = volume.fromSecret('openshift-state-metrics-tls', 'openshift-state-metrics-tls');
       local privateVolumeMount = containerVolumeMount.new(privateVolumeName, '/etc/tls/private');
