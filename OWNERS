@@ -1,11 +1,8 @@
 component: "Monitoring"
 
 reviewers:
-- wanghaoran1988
 - BlueShells
 - simonpasquier
-- paulfantom
-- dgrisonnet
 - slashpai
 - prashbnair
 - arajkumar
@@ -17,11 +14,8 @@ reviewers:
 - jan--f
 
 approvers:
-- wanghaoran1988
 - BlueShells
 - simonpasquier
-- paulfantom
-- dgrisonnet
 - slashpai
 - prashbnair
 - arajkumar
@@ -33,6 +27,9 @@ approvers:
 - jan--f
 
 emeritus_approvers:
+- wanghaoran1988
+- paulfantom
+- dgrisonnet
 - pgier
 - s-urbaniak
 - LiliC
