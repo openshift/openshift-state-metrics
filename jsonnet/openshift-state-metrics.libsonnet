@@ -14,12 +14,12 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       cpuPerNode: '2m',
       memoryPerNode: '30Mi',
     },
-    
+
     commonLabels+:: {
-        'app.kubernetes.io/name': 'openshift-state-metrics',
-        'app.kubernetes.io/component': 'exporter',
+      'app.kubernetes.io/name': 'openshift-state-metrics',
+      'app.kubernetes.io/component': 'exporter',
     },
-    
+
     versions+:: {
       openshiftStateMetrics: '4.2',
       kubeRbacProxy: '4.2',
@@ -92,26 +92,26 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
                         rulesType.withVerbs(['list', 'watch']);
 
       local quotaRule = rulesType.new() +
-                              rulesType.withApiGroups(['quota.openshift.io']) +
-                              rulesType.withResources([
-                                'clusterresourcequotas',
-                              ]) +
-                              rulesType.withVerbs(['list', 'watch']);
+                        rulesType.withApiGroups(['quota.openshift.io']) +
+                        rulesType.withResources([
+                          'clusterresourcequotas',
+                        ]) +
+                        rulesType.withVerbs(['list', 'watch']);
 
 
       local routeRule = rulesType.new() +
-                         rulesType.withApiGroups(['route.openshift.io']) +
-                         rulesType.withResources([
-                           'routes',
-                         ]) +
-                         rulesType.withVerbs(['list', 'watch']);
+                        rulesType.withApiGroups(['route.openshift.io']) +
+                        rulesType.withResources([
+                          'routes',
+                        ]) +
+                        rulesType.withVerbs(['list', 'watch']);
 
       local groupRule = rulesType.new() +
-                               rulesType.withApiGroups(['user.openshift.io']) +
-                               rulesType.withResources([
-                                 'groups',
-                               ]) +
-                               rulesType.withVerbs(['list', 'watch']);
+                        rulesType.withApiGroups(['user.openshift.io']) +
+                        rulesType.withResources([
+                          'groups',
+                        ]) +
+                        rulesType.withVerbs(['list', 'watch']);
 
       local authenticationRole = rulesType.new() +
                                  rulesType.withApiGroups(['authentication.k8s.io']) +
@@ -172,7 +172,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
           '--tls-private-key-file=/etc/tls/private/tls.key',
         ]) +
         container.withVolumeMounts([privateVolumeMount]) +
-        container.withPorts(containerPort.newNamed(9443,'https-self')) +
+        container.withPorts(containerPort.newNamed(9443, 'https-self')) +
         container.mixin.resources.withRequests({ cpu: '1m', memory: '20Mi' }) +
         container.mixin.resources.withLimits({ cpu: '20m', memory: '40Mi' });
 
@@ -216,7 +216,7 @@ local k = import 'ksonnet/ksonnet.beta.4/k.libsonnet';
       service.mixin.metadata.withLabels({ 'k8s-app': 'openshift-state-metrics' }) +
       service.mixin.spec.withClusterIp('None') +
       service.mixin.metadata.withAnnotations({
-        'service.alpha.openshift.io/serving-cert-secret-name': 'openshift-state-metrics-tls',
+        'service.beta.openshift.io/serving-cert-secret-name': 'openshift-state-metrics-tls',
       }),
 
     serviceMonitor:
