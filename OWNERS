@@ -4,25 +4,21 @@ reviewers:
 - BlueShells
 - simonpasquier
 - slashpai
-- arajkumar
 - sthaha
-- PhilipGough
-- bison
 - raptorsun
 - jan--f
 - JoaoBraveCoding
+- juanrh
 
 approvers:
 - BlueShells
 - simonpasquier
 - slashpai
-- arajkumar
 - sthaha
-- PhilipGough
-- bison
 - raptorsun
 - jan--f
 - JoaoBraveCoding
+- juanrh
 
 emeritus_approvers:
 - wanghaoran1988
@@ -31,3 +27,6 @@ emeritus_approvers:
 - pgier
 - s-urbaniak
 - LiliC
+- arajkumar
+- PhilipGough
+- bison
