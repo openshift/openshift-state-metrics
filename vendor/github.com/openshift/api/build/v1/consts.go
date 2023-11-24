@@ -52,7 +52,7 @@ const (
 	// truncated to maximum label length.
 	BuildLabel = "openshift.io/build.name"
 
-	// BuildRunPolicyLabel represents the start policy used to to start the build.
+	// BuildRunPolicyLabel represents the start policy used to start the build.
 	BuildRunPolicyLabel = "openshift.io/build.start-policy"
 
 	// BuildConfigLabelDeprecated was used as BuildConfigLabel before adding namespaces.
@@ -164,9 +164,10 @@ const (
 	StatusReasonBuildPodEvicted StatusReason = "BuildPodEvicted"
 )
 
-// env vars
-// WhitelistEnvVarNames is a list of special env vars allows s2i containers
-var WhitelistEnvVarNames = []string{"BUILD_LOGLEVEL", "GIT_SSL_NO_VERIFY", "HTTP_PROXY", "HTTPS_PROXY", "LANG", "NO_PROXY"}
+// WhitelistEnvVarNames is a list of environment variable names that are allowed to be specified
+// in a buildconfig and merged into the created build pods, the code for this is located in
+// openshift/openshift-controller-manager
+var WhitelistEnvVarNames = []string{"BUILD_LOGLEVEL", "GIT_SSL_NO_VERIFY", "GIT_LFS_SKIP_SMUDGE", "HTTP_PROXY", "HTTPS_PROXY", "LANG", "NO_PROXY"}
 
 // env vars
 const (
