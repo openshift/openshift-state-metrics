@@ -4,23 +4,29 @@ reviewers:
 - BlueShells
 - simonpasquier
 - slashpai
-- sthaha
 - raptorsun
 - jan--f
-- JoaoBraveCoding
-- juanrh
+- danielmellado
+- marioferh
+- rexagod
+- machine424
+
 
 approvers:
 - BlueShells
 - simonpasquier
 - slashpai
-- sthaha
 - raptorsun
 - jan--f
-- JoaoBraveCoding
-- juanrh
+- danielmellado
+- marioferh
+- rexagod
+- machine424
 
 emeritus_approvers:
+- sthaha
+- JoaoBraveCoding
+- juanrh
 - wanghaoran1988
 - paulfantom
 - dgrisonnet
