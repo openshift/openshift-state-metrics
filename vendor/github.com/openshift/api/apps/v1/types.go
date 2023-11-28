@@ -14,6 +14,9 @@ import (
 // +genclient:method=GetScale,verb=get,subresource=scale,result=k8s.io/api/extensions/v1beta1.Scale
 // +genclient:method=UpdateScale,verb=update,subresource=scale,input=k8s.io/api/extensions/v1beta1.Scale,result=k8s.io/api/extensions/v1beta1.Scale
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=3.0
+// +k8s:prerelease-lifecycle-gen:deprecated=4.14
+// +k8s:prerelease-lifecycle-gen:removed=4.10000
 
 // Deployment Configs define the template for a pod and manages deploying new images or configuration changes.
 // A single deployment configuration is usually analogous to a single micro-service. Can support many different
@@ -24,8 +27,15 @@ import (
 // Triggers can be disabled to allow manual control over a deployment. The "strategy" determines how the deployment
 // is carried out and may be changed at any time. The `latestVersion` field is updated when a new deployment
 // is triggered by any means.
+//
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// Deprecated: Use deployments or other means for declarative updates for pods instead.
+// +openshift:compatibility-gen:level=1
 type DeploymentConfig struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+
+	// metadata is the standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	// Spec represents a desired deployment state and how to deploy to it.
@@ -83,6 +93,7 @@ type DeploymentConfigSpec struct {
 // DeploymentStrategy describes how to perform a deployment.
 type DeploymentStrategy struct {
 	// Type is the name of a deployment strategy.
+	// +optional
 	Type DeploymentStrategyType `json:"type,omitempty" protobuf:"bytes,1,opt,name=type,casttype=DeploymentStrategyType"`
 
 	// CustomParams are the input to the Custom deployment strategy, and may also
@@ -385,10 +396,19 @@ type DeploymentCondition struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=3.0
+// +k8s:prerelease-lifecycle-gen:deprecated=4.14
+// +k8s:prerelease-lifecycle-gen:removed=4.10000
 
 // DeploymentConfigList is a collection of deployment configs.
+//
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 type DeploymentConfigList struct {
 	metav1.TypeMeta `json:",inline"`
+
+	// metadata is the standard list's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	// Items is a list of deployment configs
@@ -396,8 +416,14 @@ type DeploymentConfigList struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=3.0
+// +k8s:prerelease-lifecycle-gen:deprecated=4.14
+// +k8s:prerelease-lifecycle-gen:removed=4.10000
 
 // DeploymentConfigRollback provides the input to rollback generation.
+//
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 type DeploymentConfigRollback struct {
 	metav1.TypeMeta `json:",inline"`
 	// Name of the deployment config that will be rolled back.
@@ -425,8 +451,14 @@ type DeploymentConfigRollbackSpec struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=3.0
+// +k8s:prerelease-lifecycle-gen:deprecated=4.14
+// +k8s:prerelease-lifecycle-gen:removed=4.10000
 
 // DeploymentRequest is a request to a deployment config for a new deployment.
+//
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 type DeploymentRequest struct {
 	metav1.TypeMeta `json:",inline"`
 	// Name of the deployment config for requesting a new deployment.
@@ -443,15 +475,27 @@ type DeploymentRequest struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=3.0
+// +k8s:prerelease-lifecycle-gen:deprecated=4.14
+// +k8s:prerelease-lifecycle-gen:removed=4.10000
 
 // DeploymentLog represents the logs for a deployment
+//
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 type DeploymentLog struct {
 	metav1.TypeMeta `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +k8s:prerelease-lifecycle-gen:introduced=3.0
+// +k8s:prerelease-lifecycle-gen:deprecated=4.14
+// +k8s:prerelease-lifecycle-gen:removed=4.10000
 
 // DeploymentLogOptions is the REST options for a deployment log
+//
+// Compatibility level 1: Stable within a major release for a minimum of 12 months or 3 minor releases (whichever is longer).
+// +openshift:compatibility-gen:level=1
 type DeploymentLogOptions struct {
 	metav1.TypeMeta `json:",inline"`
 
