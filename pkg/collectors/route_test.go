@@ -17,16 +17,7 @@ var (
 func TestRouteConfigCollector(t *testing.T) {
 	// Fixed metadata on type and help text. We prepend this to every expected
 	// output so we only have to modify a single place when doing adjustments.
-	const metadata = `
-		# HELP openshift_route_created Unix creation timestamp
-		# TYPE openshift_route_created gauge
-		# HELP openshift_route_labels Kubernetes labels converted to Prometheus labels.
-		# TYPE openshift_route_labels gauge
-		# HELP openshift_route_info Information about route.
-		# TYPE openshift_route_info gauge
-		# HELP openshift_route_status Information about route status.
-		# TYPE openshift_route_status gauge
-	`
+
 	cases := []generateMetricsTestCase{
 		{
 			Obj: &v1.Route{
@@ -82,6 +73,97 @@ func TestRouteConfigCollector(t *testing.T) {
 		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router2"} 1
 				`,
 			MetricNames: []string{"openshift_route_created", "openshift_route_labels", "openshift_route_info", "openshift_route_status"},
+		},
+		{
+			Obj: &v1.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "route1",
+					Namespace: "ns1",
+				},
+				Status: v1.RouteStatus{
+					Ingress: []v1.RouteIngress{
+						{
+							Host:       "example.com",
+							RouterName: "router1",
+							Conditions: []v1.RouteIngressCondition{
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+							},
+						},
+						{
+							Host:       "example.com",
+							RouterName: "router2",
+							Conditions: []v1.RouteIngressCondition{
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+							},
+						},
+					},
+				},
+			},
+			Want: `
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router1"} 1
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router2"} 1
+				`,
+			MetricNames: []string{"openshift_route_created", "openshift_route_status"},
+		},
+		{
+			Obj: &v1.Route{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "route1",
+					Namespace: "ns1",
+				},
+				Status: v1.RouteStatus{
+					Ingress: []v1.RouteIngress{
+						{
+							Host:       "example.com",
+							RouterName: "router1",
+							Conditions: []v1.RouteIngressCondition{
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionFalse,
+								},
+							},
+						},
+						{
+							Host:       "example.com",
+							RouterName: "router2",
+							Conditions: []v1.RouteIngressCondition{
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+								{
+									Type:   v1.RouteAdmitted,
+									Status: corev1.ConditionTrue,
+								},
+							},
+						},
+					},
+				},
+			},
+			Want: `
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="False",type="Admitted",router_name="router1"} 1
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router1"} 1
+		openshift_route_status{route="route1",namespace="ns1",host="example.com",status="True",type="Admitted",router_name="router2"} 1
+				`,
+			MetricNames: []string{"openshift_route_created", "openshift_route_status"},
 		},
 	}
 
