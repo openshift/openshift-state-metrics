@@ -3,6 +3,7 @@ package collectors
 import (
 	"context"
 	"reflect"
+	"slices"
 	"strconv"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -93,14 +94,12 @@ var (
 							Value: 1,
 						}
 						// Avoid duplicates: see OCPBUGS-48747 for more information.
-						if len(f.Metrics) > 0 {
-							previousMetric := f.Metrics[len(f.Metrics)-1]
-							if reflect.DeepEqual(previousMetric.LabelKeys, nextMetric.LabelKeys) &&
-								reflect.DeepEqual(previousMetric.LabelValues, nextMetric.LabelValues) {
-								continue
-							}
+						if !slices.ContainsFunc(f.Metrics, func(m *metric.Metric) bool {
+							return reflect.DeepEqual(m.LabelKeys, nextMetric.LabelKeys) &&
+								reflect.DeepEqual(m.LabelValues, nextMetric.LabelValues)
+						}) {
+							f.Metrics = append(f.Metrics, nextMetric)
 						}
-						f.Metrics = append(f.Metrics, nextMetric)
 					}
 				}
 
