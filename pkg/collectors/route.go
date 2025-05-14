@@ -3,7 +3,6 @@ package collectors
 import (
 	"context"
 	"reflect"
-	"slices"
 	"strconv"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -94,12 +93,16 @@ var (
 							Value: 1,
 						}
 						// Avoid duplicates: see OCPBUGS-48747 for more information.
-						if !slices.ContainsFunc(f.Metrics, func(m *metric.Metric) bool {
-							return reflect.DeepEqual(m.LabelKeys, nextMetric.LabelKeys) &&
-								reflect.DeepEqual(m.LabelValues, nextMetric.LabelValues)
-						}) {
-							f.Metrics = append(f.Metrics, nextMetric)
+						// We do not check against the entirety of the metric collection for duplicates as `type,status`
+						// is guaranteed to be unique for each `job,router_name`.
+						if len(f.Metrics) > 0 {
+							previousMetric := f.Metrics[len(f.Metrics)-1]
+							if reflect.DeepEqual(previousMetric.LabelKeys, nextMetric.LabelKeys) &&
+								reflect.DeepEqual(previousMetric.LabelValues, nextMetric.LabelValues) {
+								continue
+							}
 						}
+						f.Metrics = append(f.Metrics, nextMetric)
 					}
 				}
 
