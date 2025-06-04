@@ -2,6 +2,7 @@ package collectors
 
 import (
 	"context"
+	"reflect"
 	"strconv"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -52,6 +53,10 @@ var (
 				} else {
 					termination = ""
 				}
+				toWeight := new(int32)
+				if d.Spec.To.Weight != nil {
+					toWeight = d.Spec.To.Weight
+				}
 				f.Metrics = append(f.Metrics, &metric.Metric{
 					LabelKeys: []string{"host", "path", "tls_termination", "to_kind", "to_name", "to_weight"},
 					LabelValues: []string{
@@ -60,7 +65,7 @@ var (
 						termination,
 						d.Spec.To.Kind,
 						d.Spec.To.Name,
-						strconv.FormatInt(int64(*d.Spec.To.Weight), 10),
+						strconv.FormatInt(int64(*toWeight), 10),
 					},
 					Value: 1,
 				})
@@ -77,7 +82,7 @@ var (
 
 				for _, m := range d.Status.Ingress {
 					for _, c := range m.Conditions {
-						f.Metrics = append(f.Metrics, &metric.Metric{
+						nextMetric := &metric.Metric{
 							LabelKeys: []string{"status", "type", "host", "router_name"},
 							LabelValues: []string{
 								string(c.Status),
@@ -86,7 +91,18 @@ var (
 								m.RouterName,
 							},
 							Value: 1,
-						})
+						}
+						// Avoid duplicates: see OCPBUGS-48747 for more information.
+						// We do not check against the entirety of the metric collection for duplicates as `type,status`
+						// is guaranteed to be unique for each `job,router_name`.
+						if len(f.Metrics) > 0 {
+							previousMetric := f.Metrics[len(f.Metrics)-1]
+							if reflect.DeepEqual(previousMetric.LabelKeys, nextMetric.LabelKeys) &&
+								reflect.DeepEqual(previousMetric.LabelValues, nextMetric.LabelValues) {
+								continue
+							}
+						}
+						f.Metrics = append(f.Metrics, nextMetric)
 					}
 				}
 
