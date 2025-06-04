@@ -1,6 +1,6 @@
 module github.com/openshift/openshift-state-metrics
 
-go 1.22
+go 1.22.0
 
 require (
 	github.com/openshift/api v0.0.0-20231123212421-7955d3da79e8
