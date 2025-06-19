@@ -2,6 +2,7 @@ package collectors
 
 import (
 	"context"
+	"reflect"
 	"strconv"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -77,7 +78,7 @@ var (
 
 				for _, m := range d.Status.Ingress {
 					for _, c := range m.Conditions {
-						f.Metrics = append(f.Metrics, &metric.Metric{
+						nextMetric := &metric.Metric{
 							LabelKeys: []string{"status", "type", "host", "router_name"},
 							LabelValues: []string{
 								string(c.Status),
@@ -86,7 +87,18 @@ var (
 								m.RouterName,
 							},
 							Value: 1,
-						})
+						}
+						// Avoid duplicates: see OCPBUGS-48747 for more information.
+						// We do not check against the entirety of the metric collection for duplicates as `type,status`
+						// is guaranteed to be unique for each `job,router_name`.
+						if len(f.Metrics) > 0 {
+							previousMetric := f.Metrics[len(f.Metrics)-1]
+							if reflect.DeepEqual(previousMetric.LabelKeys, nextMetric.LabelKeys) &&
+								reflect.DeepEqual(previousMetric.LabelValues, nextMetric.LabelValues) {
+								continue
+							}
+						}
+						f.Metrics = append(f.Metrics, nextMetric)
 					}
 				}
 
