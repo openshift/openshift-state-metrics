@@ -68,6 +68,9 @@ var (
 				return f
 			}),
 		},
+		// OCPBUGS-48747: `type: Admitted` should be unique for each
+		// `status.ingress` entry, so there's no need for
+		// de-duplication here for that case.
 		metric.FamilyGenerator{
 			Name: "openshift_route_status",
 			Type: metric.MetricTypeGauge,
