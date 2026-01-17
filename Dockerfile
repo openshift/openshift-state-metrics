@@ -3,7 +3,7 @@ WORKDIR /go/src/github.com/openshift/openshift-state-metrics
 COPY . .
 RUN make build
 
-FROM registry.ci.openshift.org/ocp/4.22:base-rhel9
+FROM registry.ci.openshift.org/ocp/4.22:base-rhel9-minimal
 LABEL io.k8s.display-name="openshift-state-metrics" \
       io.k8s.description="This is a component that exposes metrics about OpenShift objects." \
       io.openshift.tags="OpenShift" \
