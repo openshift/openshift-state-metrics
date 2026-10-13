@@ -1,0 +1,21 @@
+sudo: required
+
+language: go
+
+go:
+    - "1.12.x"
+
+services:
+  - docker
+
+env:
+  global:
+      - SUDO=sudo
+jobs:
+  include:
+    # gofmt
+    - script: make gofmtcheck
+    # Unit Test
+    - script: make test-unit
+    # Build
+    - script: make build
