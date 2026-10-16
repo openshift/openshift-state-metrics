@@ -1,26 +1,25 @@
 component: "Monitoring"
 
 reviewers:
-- BlueShells
 - simonpasquier
 - slashpai
-- sthaha
-- raptorsun
 - jan--f
-- JoaoBraveCoding
-- juanrh
+- danielmellado
+- marioferh
+- machine424
 
 approvers:
-- BlueShells
 - simonpasquier
 - slashpai
-- sthaha
-- raptorsun
 - jan--f
-- JoaoBraveCoding
-- juanrh
+- danielmellado
+- marioferh
+- machine424
 
 emeritus_approvers:
+- sthaha
+- JoaoBraveCoding
+- juanrh
 - wanghaoran1988
 - paulfantom
 - dgrisonnet
@@ -30,3 +29,6 @@ emeritus_approvers:
 - arajkumar
 - PhilipGough
 - bison
+- BlueShells
+- rexagod
+- raptorsun
